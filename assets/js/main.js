@@ -120,3 +120,8 @@
         document.getElementById('userEmail').addEventListener('input', function () {
             this.value = this.value.replace(/\s/g, '');
         });
+
+        ///copyright
+        // Automatically injects the current system calendar year into the footer
+        document.getElementById('copyright-year').textContent = new Date().getFullYear();
+
