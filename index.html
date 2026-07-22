@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PULSE. - Discover & Register For Live Events</title>
+
+
+    <!-- Bootstrap 5.3 CSS -->
+     <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    
+    <!-- Font Awesome & Tabler Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+
+    <!-- Toastify & Grid.js CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
+
+    <!-- Custom CSS -->
+
+    <!-- Scripts (Apex, Chart.js, Grid.js) -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gridjs/dist/gridjs.umd.js"></script>
+
+    <!-- script for qr.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        /* Base Dark Theme */
+        body {
+            background-color: #0b0c10;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Hero Layout Setup */
+        .hero-section {
+            position: relative;
+            min-height: 85vh; /* Slightly reduced so users see there is content below */
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+        .hero-video { z-index: 0; }
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Reduced opacity from 0.8 to 0.6 for better background visibility */
+            background: rgba(0, 0, 0, 0.6); 
+            z-index: 1;
+        }
+        
+        .hero-content { position: relative; z-index: 2; }
+
+        /* Typography Customizations */
+        .brand-text { letter-spacing: 1px; }
+        .brand-dot { color: #dc3545; }
+        .badge-live {
+            background-color: #b03a42;
+            color: #ffffff;
+            font-size: 0.85rem;
+            letter-spacing: 1.5px;
+            padding: 8px 20px;
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+        }
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.3rem; }
+        }
+        .hero-description {
+            font-size: 1.2rem;
+            color: #cccccc;
+            max-width: 750px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        /* Custom Event Cards Styling */
+        .event-card {
+            background-color: #1f2128;
+            border: 1px solid #2e3039;
+            border-radius: 12px;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+            height: 100%;
+        }
+        .event-card:hover {
+            transform: translateY(-5px);
+            border-color: #dc3545;
+        }
+        .event-card img {
+            border-top-left-radius: 11px;
+            border-top-right-radius: 11px;
+            height: 200px;
+            object-fit: cover;
+        }
+        .text-muted-custom {
+            color: #a0a5b5;
+        }
+
+        /* UI Interactive Buttons */
+        .btn-live-red {
+            background-color: #dc3545;
+            color: white; border: none;
+            padding: 12px 30px; border-radius: 50px;
+            font-weight: 500; transition: all 0.2s ease;
+        }
+        .btn-live-red:hover { background-color: #bd2130; color: white; }
+        
+        .btn-outline-white {
+            background-color: transparent;
+            color: white; border: 1px solid #ffffff;
+            padding: 12px 30px; border-radius: 50px;
+            font-weight: 500; transition: all 0.2s ease;
+        }
+        .btn-outline-white:hover { background-color: rgba(255, 255, 255, 0.1); color: white; }
+    </style>
+</head>
+<body>
+
+    <!-- 1. STICKY NAVIGATION -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-transparent fixed-top pt-4" style="z-index: 3;">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-3 brand-text" href="#">
+                <i class="bi bi-radial-gradient-circle text-danger me-2"></i>PULSE<span class="brand-dot">.</span>
+            </a>
+            <div class="ms-auto">
+                <a href="#events-section" class="btn btn-outline-white px-4 py-2 fs-6">Explore Events</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 2. REFACTORED HERO CONTAINER -->
+    <header class="hero-section text-center">
+        <video class="position-absolute top-0 start-0 w-100 h-100 hero-video" 
+            style="object-fit: cover;" 
+            src="https://assets.mixkit.co/videos/14088/14088-720.mp4" 
+            autoplay 
+            muted 
+            loop 
+            playsinline>
+        </video>
+        
+        <div class="hero-overlay"></div>
+        
+        <div class="container hero-content">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="mb-4">
+                        <span class="badge-live fw-bold text-uppercase"><i class="bi bi-calendar-event"></i> Booking Open</span>
+                    </div>
+                    <!-- Changed writeup to target general events platform -->
+                    <h1 class="hero-title mb-4">Unforgettable Experiences.<br>One Single Platform.</h1>
+                    <p class="hero-description mb-5">Discover premium live music festivals, elite business conventions, and tech hackathons near you. Reserve your spot instantly.</p>
+                    <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
+                        <a href="#events-section" class="btn btn-live-red d-inline-flex align-items-center justify-content-center gap-2">
+                            <i class="bi bi-search"></i> Browse Upcoming Events
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 3. UPCOMING EVENTS 3-COLUMN GRID SECTION -->
+    <section class="container my-5 py-5" id="events-section">
+        <div class="row mb-5 text-center text-sm-start align-items-center">
+            <div class="col-sm-8">
+                <h2 class="fw-bold fs-1">Upcoming Events</h2>
+                <p class="text-muted-custom mb-0">Select an experience below and register to lock in your passes.</p>
+            </div>
+        </div>
+        <div class="row g-4" id="events-grid-container">
+            <!-- Cards injected via JS -->
+        </div>
+    </section>
+
+    <!-- 4. DYNAMIC REGISTRATION MODAL -->
+    <div class="modal fade" id="registrationModal" tabindex="-1" aria-labelledby="registrationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <!-- Custom modal styling using your app's dark color variables -->
+            <div class="modal-content border-secondary" style="background-color: #1f2128; color: #ffffff;">
+                <div class="modal-header border-bottom border-secondary">
+                    <h5 class="modal-title fw-bold" id="registrationModalLabel">Event Registration</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <!-- Event Summary Context Header Box -->
+                    <div class="p-3 mb-4 rounded" style="background-color: #0b0c10; border-left: 4px solid #dc3545;">
+                        <h6 id="modal-event-title" class="fw-bold mb-1 text-white">Event Title</h6>
+                        <small id="modal-event-meta" class="text-danger fw-bold text-uppercase"></small>
+                    </div>
+
+                    <!-- Vanilla Registration Form Structure -->
+                    <form id="registrationForm">
+                        <!-- Hidden input to maintain strict reference mapping for Node.js routing later -->
+                        <input type="hidden" id="form-event-id" name="eventId">
+
+                        <div class="mb-3">
+                            <label for="userName" class="form-label small fw-bold text-uppercase tracking-wider text-muted">Full Name</label>
+                            <input type="text" class="form-control bg-dark text-white border-secondary" id="userName" placeholder="John Doe" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="userEmail" class="form-label small fw-bold text-uppercase tracking-wider text-muted">Email Address</label>
+                            <input type="email" class="form-control bg-dark text-white border-secondary" id="userEmail" placeholder="johndoe@example.com" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-live-red w-100 py-2 rounded-pill fw-bold">
+                            <i class="bi bi-check-circle-fill me-1"></i> Confirm Registration
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5.3 JS Bundle --><!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <!-- 5. REWRITTEN INTERACTIVE JAVASCRIPT LAYER -->
+    <script>
+        const sampleEventsData = [
+            {
+                id: 1,
+                title: "Global Tech Summit 2026",
+                date: "Saturday, Oct 14",
+                location: "Main Stage / Convention Center",
+                image: "assets/img/global-tech-summit.jpg",
+                description: "Connect with world-class engineers, project builders, and startup creators shaping the modern landscape of the web."
+            },
+            {
+                id: 2,
+                title: "Summer Beats Music Festival",
+                date: "Saturday, Nov 22",
+                location: "Outdoor Arena Grounds",
+                image: "assets/img/summer-beats.jpg",
+                description: "Experience premium multi-genre music stages, intense lighting arrays, and food courts under open skies."
+            },
+            {
+                id: 3,
+                title: "CodeSprint Hackathon",
+                date: "Friday, Dec 05",
+                location: "Innovation Hub Labs",
+                image: "assets/img/codesprint-hackathon.jpg",
+                description: "A fast-paced 48-hour team coding sprint designed to build real-world software solutions for amazing prizes."
+            }
+        ];
+
+        // 1. Initial execution logic loading cards inside grid bounds
+        function displayEvents() {
+            const container = document.getElementById('events-grid-container');
+            container.innerHTML = '';
+
+            sampleEventsData.forEach(event => {
+                const cardMarkup = `
+                    <div class="col-12 col-md-4">
+                        <div class="card event-card text-white">
+                            <img src="${event.image}" class="card-img-top" alt="${event.title}">
+                            <div class="card-body d-flex flex-column justify-content-between p-4">
+                                <div>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <small class="text-danger fw-bold text-uppercase"><i class="bi bi-calendar3"></i> ${event.date}</small>
+                                    </div>
+                                    <h4 class="card-title fw-bold mb-2">${event.title}</h4>
+                                    <p class="text-muted-custom small mb-3"><i class="bi bi-geo-alt"></i> ${event.location}</p>
+                                    <p class="card-text text-muted-custom mb-4">${event.description}</p>
+                                </div>
+                                <button class="btn btn-live-red w-100 py-2 rounded-pill mt-auto" onclick="handleRegistration(${event.id})">
+                                    <i class="bi bi-pencil-square"></i> Register
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardMarkup;
+            });
+        }
+
+        // 2. REWRITTEN REGISTRATION TRIGGER FUNCTION
+        function handleRegistration(eventId) {
+            // Find specific matching element attributes within data block
+            const selectedEvent = sampleEventsData.find(e => e.id === eventId);
+            
+            if (!selectedEvent) return;
+
+            // Target modal nodes and populate them with the chosen card context details
+            document.getElementById('form-event-id').value = selectedEvent.id;
+            document.getElementById('modal-event-title').innerText = selectedEvent.title;
+            document.getElementById('modal-event-meta').innerHTML = `<i class="bi bi-calendar3"></i> ${selectedEvent.date} | <i class="bi bi-geo-alt"></i> ${selectedEvent.location}`;
+
+            // Initialize and open the Bootstrap modal interface natively using Vanilla JS
+            const targetModalNode = document.getElementById('registrationModal');
+            const bootstrapModalInstance = new bootstrap.Modal(targetModalNode);
+            bootstrapModalInstance.show();
+        }
+
+        // 3. SECURE FORM SUBMIT INTERCEPT HANDLER
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent standard page refreshes
+
+            // Read the dynamic capture arguments
+            const registrationPayload = {
+                eventId: document.getElementById('form-event-id').value,
+                fullName: document.getElementById('userName').value,
+                email: document.getElementById('userEmail').value
+            };
+
+            console.log("Ready to stream payload directly to Express controller route:", registrationPayload);
+
+            // Mock success alert message to client interface context
+            alert(`Success!\nRegistered ${registrationPayload.fullName} for Event ID: ${registrationPayload.eventId}`);
+
+            // Programmatically close the open modal container instance
+            const openModalElement = document.getElementById('registrationModal');
+            const instance = bootstrap.Modal.getInstance(openModalElement);
+            instance.hide();
+
+            // Reset inputs ready for alternative transactions
+            this.reset();
+        });
+
+        document.addEventListener('DOMContentLoaded', displayEvents);
+    </script>
+</body>
+</html>
