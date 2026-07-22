@@ -196,35 +196,60 @@
     </section>
 
     <!-- 4. DYNAMIC REGISTRATION MODAL -->
+    <!-- DYNAMIC REGISTRATION MODAL -->
+    <!-- DYNAMIC REGISTRATION MODAL WITH VISIBLE LABELS -->
     <div class="modal fade" id="registrationModal" tabindex="-1" aria-labelledby="registrationModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <!-- Custom modal styling using your app's dark color variables -->
             <div class="modal-content border-secondary" style="background-color: #1f2128; color: #ffffff;">
                 <div class="modal-header border-bottom border-secondary">
                     <h5 class="modal-title fw-bold" id="registrationModalLabel">Event Registration</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
-                    <!-- Event Summary Context Header Box -->
                     <div class="p-3 mb-4 rounded" style="background-color: #0b0c10; border-left: 4px solid #dc3545;">
                         <h6 id="modal-event-title" class="fw-bold mb-1 text-white">Event Title</h6>
                         <small id="modal-event-meta" class="text-danger fw-bold text-uppercase"></small>
                     </div>
 
-                    <!-- Vanilla Registration Form Structure -->
                     <form id="registrationForm">
-                        <!-- Hidden input to maintain strict reference mapping for Node.js routing later -->
                         <input type="hidden" id="form-event-id" name="eventId">
 
+                        <!-- Full Name Label (Changed to text-light) -->
                         <div class="mb-3">
-                            <label for="userName" class="form-label small fw-bold text-uppercase tracking-wider text-muted">Full Name</label>
+                            <label for="userName" class="form-label small fw-bold text-uppercase text-light">Full Name</label>
                             <input type="text" class="form-control bg-dark text-white border-secondary" id="userName" placeholder="John Doe" required>
                         </div>
+
+                        <!-- Email Address Label (Changed to text-light) -->
+<!-- Email Address with Native and Custom RegEx Validation -->
+<div class="mb-3">
+    <label for="userEmail" class="form-label small fw-bold text-uppercase text-light">Email Address</label>
+    <input 
+        type="email" 
+        class="form-control bg-dark text-white border-secondary" 
+        id="userEmail" 
+        placeholder="johndoe@example.com" 
+        pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+        title="Please enter a valid email address (e.g., name@domain.com)."
+        required
+    >
+</div>
+
+
+                        <!-- CP Number Label (Changed to text-light) -->
+                        <!-- CP Number Label & Input with Strict Validation Pattern -->
                         <div class="mb-4">
-                            <label for="userEmail" class="form-label small fw-bold text-uppercase tracking-wider text-muted">Email Address</label>
-                            <input type="email" class="form-control bg-dark text-white border-secondary" id="userEmail" placeholder="johndoe@example.com" required>
+                            <label for="userPhone" class="form-label small fw-bold text-uppercase text-light">CP Number (Mobile)</label>
+                            <input 
+                                type="text" 
+                                class="form-control bg-dark text-white border-secondary" 
+                                id="userPhone" 
+                                placeholder="+639123456789 or 09123456789" 
+                                pattern="^\+?[0-9]+$" 
+                                title="Phone number must only contain digits and can optionally start with a '+' sign."
+                                required
+                            >
                         </div>
-                        
                         <button type="submit" class="btn btn-live-red w-100 py-2 rounded-pill fw-bold">
                             <i class="bi bi-check-circle-fill me-1"></i> Confirm Registration
                         </button>
@@ -341,6 +366,28 @@
         });
 
         document.addEventListener('DOMContentLoaded', displayEvents);
+
+        //for cp
+        // Strict real-time character mask for the phone input field
+        document.getElementById('userPhone').addEventListener('input', function (e) {
+            let value = this.value;
+
+            // 1. Check if the very first character is a plus sign
+            const hasPlus = value.startsWith('+');
+
+            // 2. Strip absolutely everything that is not a raw number digit
+            let cleanNumbers = value.replace(/[^0-9]/g, '');
+
+            // 3. Reconstruct the string: re-apply the plus only if it was originally there
+            this.value = (hasPlus ? '+' : '') + cleanNumbers;
+        });
+
+        //for email
+        // Automatically removes spaces from the email input in real time
+        document.getElementById('userEmail').addEventListener('input', function () {
+            this.value = this.value.replace(/\s/g, '');
+        });
+
     </script>
 </body>
 </html>
