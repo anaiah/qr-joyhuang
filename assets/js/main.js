@@ -98,7 +98,17 @@
             this.reset();
         });
 
-        document.addEventListener('DOMContentLoaded', displayEvents);
+        //document.addEventListener('DOMContentLoaded', displayEvents);
+
+        //==================IMPORTANT DOCUMENT CONTENT LOADED =================//
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('======displaying events')
+            displayEvents();
+
+            jhuang.speak('yes')
+
+        });
+        
 
         //for cp
         // Strict real-time character mask for the phone input field

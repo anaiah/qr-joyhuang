@@ -145,6 +145,9 @@
                 <i class="bi bi-radial-gradient-circle text-danger me-2"></i>PULSE<span class="brand-dot">.</span>
             </a>
             <div class="ms-auto">
+                <!-- <a href="#hrisloadModal" data-bs-toggle="modal" class="btn btn-outline-white me-2 px-4 py-2 fs-6">Upload Excel</a> -->
+                <a href="#hrisloadModal" data-bs-toggle="modal" class="btn btn-success me-2 px-4 py-2 fs-6"><i class="ti ti-file-type-xls fs-3 me-1"></i>Upload Excel</a>
+
                 <a href="#events-section" class="btn btn-outline-white px-4 py-2 fs-6">Explore Events</a>
             </div>
         </div>
@@ -231,19 +234,19 @@
                         </div>
 
                         <!-- Email Address Label (Changed to text-light) -->
-<!-- Email Address with Native and Custom RegEx Validation -->
-<div class="mb-3">
-    <label for="userEmail" class="form-label small fw-bold text-uppercase text-light">Email Address</label>
-    <input 
-        type="email" 
-        class="form-control bg-dark text-white border-secondary" 
-        id="userEmail" 
-        placeholder="johndoe@example.com" 
-        pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-        title="Please enter a valid email address (e.g., name@domain.com)."
-        required
-    >
-</div>
+                        <!-- Email Address with Native and Custom RegEx Validation -->
+                        <div class="mb-3">
+                            <label for="userEmail" class="form-label small fw-bold text-uppercase text-light">Email Address</label>
+                            <input 
+                                type="email" 
+                                class="form-control bg-dark text-white border-secondary" 
+                                id="userEmail" 
+                                placeholder="johndoe@example.com" 
+                                pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                                title="Please enter a valid email address (e.g., name@domain.com)."
+                                required
+                            >
+                        </div>
 
 
                         <!-- CP Number Label (Changed to text-light) -->
@@ -269,11 +272,62 @@
         </div>
     </div>
 
+    <!-- MODAL FOR UPLOADING EXCEL FILE  -->
+    <div class="modal fade" id="hrisloadModal" tabindex="-1" aria-labelledby="hrisloadModalLabel" aria-hidden="true">
+        <div class="modal-dialog  modal-dialog-scrollable">
+            <div class="modal-content">
+                
+                <div class="modal-header bg-primary">
+                    <h4 class="modal-title"><i class="bi-pencil-square" style="font-size:17px"></i> Excel Event Registry Upload</h4>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal"></button>
+                </div>
+
+                <!--//modal body-->
+                <div class="modal-body">
+                    
+                    <!--//=== ALERT CONTAINER!!!-->
+                    <div id="hrisloadPlaceHolder"></div>
+                    <!--//END ALERT-->
+                    
+                    <div class="row">
+                    <div class="col-12">
+                        <!-- //form file upload onrender.com -->
+                        <form id="hrisuploadForm" name="hrisuploadForm" action="" enctype="multipart/form-data" method="post">
+                        <div class="form-outline">
+
+                          
+                            <label class="form-label mb-0" for="hris_upload_file">Upload Excel File</label>
+                            <input type="file" class="form-control uploadz mb-2" name="hris_upload_file" id="hris_upload_file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" required />
+
+                            <button onclick="javascript:jhuang.qrxls()" id="hris-upload-btn" name="hris-upload-btn" type="button" class="btn btn-primary">
+                            <i class="ti ti-upload"></i> Upload
+                            </button>
+
+                        </div>
+                        </form>
+                        <!--//end form -->
+                    </div>
+                    </div>
+                    
+                </div><!--//end modalbody//-->
+                <!--//footer-->
+                <div class="modal-footer">
+                    <button class="btn btn-light" type="button" data-bs-dismiss="modal">Close</button>
+                    <!-- <button class="btn btn-primary" id="mall-save-btn" onclick="" type="button">
+                    <i id="i-save" class="fa fa-floppy-o"></i> Save
+                    </button> -->
+                </div>
+            </div>
+        </div>
+    </div>	
+
     <!-- Bootstrap 5.3 JS Bundle --><!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
     <!-- 5. REWRITTEN INTERACTIVE JAVASCRIPT LAYER -->
-    <script src="assets/js/main.min.js?v=1.0"></script>
+    <script src="assets/js/util.min.js?v=1.2"></script> 
+
+    <script src="assets/js/main.min.js?v=1.2"></script>
 </body>
 </html>
