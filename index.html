@@ -24,6 +24,7 @@
     <link href="https://cdn.jsdelivr.net/npm/gridjs/dist/theme/mermaid.min.css" rel="stylesheet" />
 
     <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="assets/css/jhuang.css">
 
     <!-- Scripts (Apex, Chart.js, Grid.js) -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
@@ -34,121 +35,43 @@
     <!-- script for qr.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-    <style>
-        /* Base Dark Theme */
-        body {
-            background-color: #0b0c10;
-            color: #ffffff;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            overflow-x: hidden;
-        }
-
-        /* Hero Layout Setup */
-        .hero-section {
-            position: relative;
-            min-height: 85vh; /* Slightly reduced so users see there is content below */
-            display: flex;
-            align-items: center;
-            overflow: hidden;
-        }
-        .hero-video { z-index: 0; }
-        .hero-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            /* Reduced opacity from 0.8 to 0.6 for better background visibility */
-            background: rgba(0, 0, 0, 0.6); 
-            z-index: 1;
-        }
-        
-        .hero-content { position: relative; z-index: 2; }
-
-        /* Typography Customizations */
-        .brand-text { letter-spacing: 1px; }
-        .brand-dot { color: #dc3545; }
-        .badge-live {
-            background-color: #b03a42;
-            color: #ffffff;
-            font-size: 0.85rem;
-            letter-spacing: 1.5px;
-            padding: 8px 20px;
-            border-radius: 50px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .hero-title {
-            font-size: 4rem;
-            font-weight: 700;
-            line-height: 1.2;
-            letter-spacing: -0.5px;
-        }
-        @media (max-width: 768px) {
-            .hero-title { font-size: 2.3rem; }
-        }
-        .hero-description {
-            font-size: 1.2rem;
-            color: #cccccc;
-            max-width: 750px;
-            margin: 0 auto;
-            font-weight: 300;
-        }
-
-        /* Custom Event Cards Styling */
-        .event-card {
-            background-color: #1f2128;
-            border: 1px solid #2e3039;
-            border-radius: 12px;
-            transition: transform 0.2s ease, border-color 0.2s ease;
-            height: 100%;
-        }
-        .event-card:hover {
-            transform: translateY(-5px);
-            border-color: #dc3545;
-        }
-        .event-card img {
-            border-top-left-radius: 11px;
-            border-top-right-radius: 11px;
-            height: 200px;
-            object-fit: cover;
-        }
-        .text-muted-custom {
-            color: #a0a5b5;
-        }
-
-        /* UI Interactive Buttons */
-        .btn-live-red {
-            background-color: #dc3545;
-            color: white; border: none;
-            padding: 12px 30px; border-radius: 50px;
-            font-weight: 500; transition: all 0.2s ease;
-        }
-        .btn-live-red:hover { background-color: #bd2130; color: white; }
-        
-        .btn-outline-white {
-            background-color: transparent;
-            color: white; border: 1px solid #ffffff;
-            padding: 12px 30px; border-radius: 50px;
-            font-weight: 500; transition: all 0.2s ease;
-        }
-        .btn-outline-white:hover { background-color: rgba(255, 255, 255, 0.1); color: white; }
-    </style>
 </head>
 <body>
 
     <!-- 1. STICKY NAVIGATION -->
+    <!-- 1. RESPONSIVE STICKY NAVIGATION -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-transparent fixed-top pt-4" style="z-index: 3;">
         <div class="container">
+            <!-- Brand Logo Area -->
             <a class="navbar-brand fw-bold fs-3 brand-text" href="#">
                 <i class="bi bi-radial-gradient-circle text-danger me-2"></i>PULSE<span class="brand-dot">.</span>
             </a>
-            <div class="ms-auto">
-                <!-- <a href="#hrisloadModal" data-bs-toggle="modal" class="btn btn-outline-white me-2 px-4 py-2 fs-6">Upload Excel</a> -->
-                <a href="#hrisloadModal" data-bs-toggle="modal" class="btn btn-success me-2 px-4 py-2 fs-6"><i class="ti ti-file-type-xls fs-3 me-1"></i>Upload Excel</a>
+            
+            <!-- Mobile Hamburger Button Toggle -->
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#pulseNavbar" aria-controls="pulseNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-                <a href="#events-section" class="btn btn-outline-white px-4 py-2 fs-6">Explore Events</a>
+            <!-- Collapsible Menu Items Matrix -->
+            <div class="collapse navbar-collapse" id="pulseNavbar">
+                <!-- AFTER (Pushed Far Right) -->
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-3 align-items-lg-center">
+                    <li class="nav-item">
+                        <a class="nav-link text-light fs-6" href="#events-section">Events</a>
+                    </li>
+                    <!-- Triggers your full-window registration/management screen -->
+                    <li class="nav-item">
+                        <a class="nav-link text-light fs-6" href="#registrationModal" data-bs-toggle="modal">Login</a>
+                    </li>
+                      <li class="nav-item">
+                        <!-- #hrisloadModal -->
+                        <a class="nav-link text-light fs-6" href="javascript:void(0)" data-bs-toggle="modal">Upload Excel</a>
+                    </li>
+                    <!-- Triggers your full-window registration/management screen -->
+                    <li class="nav-item">
+                        <a class="nav-link text-light fs-6" href="javascript:void(0)" id='open-dash-btn'>Dashboard</a>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>
@@ -209,7 +132,6 @@
 
 
     <!-- 4. DYNAMIC REGISTRATION MODAL -->
-    <!-- DYNAMIC REGISTRATION MODAL -->
     <!-- DYNAMIC REGISTRATION MODAL WITH VISIBLE LABELS -->
     <div class="modal fade" id="registrationModal" tabindex="-1" aria-labelledby="registrationModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -321,6 +243,48 @@
         </div>
     </div>	
 
+    <!-- FULL-WINDOW REGISTRATION MODAL -->
+    <div class="modal fade" id="dashboardModal" tabindex="-1" aria-labelledby="dashboardModalLabel" aria-hidden="true">
+        <!-- modal-fullscreen forces the dialog box to occupy 100% width and height of the screen -->
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content border-0 rounded-0" style="background-color: #0b0c10; color: #ffffff;">
+                
+                <!-- Modal Header -->
+                <div class="modal-header border-bottom border-secondary px-4 py-3">
+                    
+                    <h5 class="modal-title fw-bold fs-4" id="dashboardModalLabel">
+                        <i class="bi bi-grid-3x3-gap-fill text-danger me-2"></i>Registration Management
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white fs-5" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <!-- Modal Body Area -->
+                <div class="modal-body p-4 p-md-5">
+                    <!-- Context Description Optional Sub-heading -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold mb-1">Master Records</h3>
+                        <p class="text-light opacity-75 small mb-0">Reviewing compiled live database entries and user matrix transactions.</p>
+                    </div>
+
+                    <!-- Your Required Table Data Grid Container Wireframe -->
+                    <div class="table-responsive rounded shadow-sm border border-secondary" style="background-color: #1f2128;">
+                        <div id="dgrp-grid" class="p-3">
+                            <!-- Data grid elements or library rendering targets go here -->
+                            <span class="text-muted small">Loading relational grid matrix components...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Optional Sticky Modal Action Footer Footer -->
+                <div class="modal-footer border-top border-secondary px-4 py-3">
+                    <button type="button" class="btn btn-outline-white px-4 rounded-pill" data-bs-dismiss="modal">Close Overlay</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
     <!-- Bootstrap 5.3 JS Bundle --><!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
@@ -328,6 +292,6 @@
     <!-- 5. REWRITTEN INTERACTIVE JAVASCRIPT LAYER -->
     <script src="assets/js/util.min.js?v=1.2"></script> 
 
-    <script src="assets/js/main.min.js?v=1.2"></script>
+    <script src="assets/js/main.min.js?v=1.3"></script>
 </body>
 </html>

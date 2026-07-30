@@ -1,5 +1,5 @@
-//const myIp = "http://192.168.1.16:10000" 
-const myIp= "https://asn-jtgrp-api.onrender.com"
+const myIp = "http://192.168.1.16:10000" 
+//const myIp= "https://asn-jtgrp-api.onrender.com"
 
 //speech synthesis
 const synth = window.speechSynthesis;

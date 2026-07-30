@@ -1,137 +1,358 @@
-        const sampleEventsData = [
-            {
-                id: 1,
-                title: "Global Tech Summit 2026",
-                date: "Saturday, Oct 14",
-                location: "Main Stage / Convention Center",
-                image: "assets/img/global-tech-summit.jpg",
-                description: "Connect with world-class engineers, project builders, and startup creators shaping the modern landscape of the web."
-            },
-            {
-                id: 2,
-                title: "Summer Beats Music Festival",
-                date: "Saturday, Nov 22",
-                location: "Outdoor Arena Grounds",
-                image: "assets/img/summer-beats.jpg",
-                description: "Experience premium multi-genre music stages, intense lighting arrays, and food courts under open skies."
-            },
-            {
-                id: 3,
-                title: "CodeSprint Hackathon",
-                date: "Friday, Dec 05",
-                location: "Innovation Hub Labs",
-                image: "assets/img/codesprint-hackathon.jpg",
-                description: "A fast-paced 48-hour team coding sprint designed to build real-world software solutions for amazing prizes."
-            }
-        ];
+//===== load grid
+document.getElementById('dgrp-grid').innerHTML=""
 
-        // 1. Initial execution logic loading cards inside grid bounds
-        function displayEvents() {
-            const container = document.getElementById('events-grid-container');
-            container.innerHTML = '';
+const grid = new gridjs.Grid({
+    columns: [
+        {
+            name: "Name",
+            width: "100%",
+            //height:"100%",
 
-            sampleEventsData.forEach(event => {
-                const cardMarkup = `
-                    <div class="col-12 col-md-4">
-                        <div class="card event-card text-white">
-                            <img src="${event.image}" class="card-img-top" alt="${event.title}">
-                            <div class="card-body d-flex flex-column justify-content-between p-4">
-                                <div>
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <small class="text-danger fw-bold text-uppercase"><i class="bi bi-calendar3"></i> ${event.date}</small>
-                                    </div>
-                                    <h4 class="card-title fw-bold mb-2">${event.title}</h4>
-                                    <p class="text-muted-custom small mb-3"><i class="bi bi-geo-alt"></i> ${event.location}</p>
-                                    <p class="card-text text-muted-custom mb-4">${event.description}</p>
-                                </div>
-                                <button class="btn btn-live-red w-100 py-2 rounded-pill mt-auto" onclick="handleRegistration(${event.id})">
-                                    <i class="bi bi-pencil-square"></i> Register
-                                </button>
-                            </div>
+            formatter: (cell, row) => {
+                const registeredName = row.cells[0].data;
+                const registeredEmail = row.cells[1].data;
+
+                // Escape strings to prevent syntax breakages inside the onclick string
+                const escapedName = registeredName.replace(/'/g, "\\'");
+                const escapedEmail = registeredEmail.replace(/'/g, "\\'");
+
+                // Safety check to ensure we don't format the custom empty state row
+                if ( registeredName === "") {
+
+                    return gridjs.html(`
+                        <div style="
+                        position: absolute;
+                        left: 0;
+                        width: 100%;
+                        text-align: center;
+                        color: #adb5bd;
+                        font-size: 0.9rem;
+                        font-weight: 500;
+                        padding: 40px 0;
+                        background-color: #212529;
+                        pointer-events: none;
+                        ">
+                        No matching records found.
                         </div>
+                    `);
+                    
+                } else {
+                     return gridjs.html(`
+                        <!-- 🌟 FIXED: Added max-width and margin:0 auto to lock width tracking -->
+                        <div class="p-3 w-100 mx-auto rounded-3 text-white border border-secondary border-opacity-20 shadow-sm" 
+                             style="background-color: #1f2128; max-width: 100%; box-sizing: border-box;">
+                            
+                            <!-- Header Title -->
+                            <div class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom border-secondary border-opacity-30">
+                                <h6 class="m-0 fw-bold tracking-wide" style="color: #0dcaf0; font-size: 0.95rem;">
+                                    ${registeredName}
+                                </h6>
+                                <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger border border-danger border-opacity-20 px-2 py-0.5" style="font-size: 0.65rem; font-weight: 600;">
+                                    Attendee
+                                </span>
+                            </div>
+
+                            <!-- Metadata Info -->
+                            <div class="row g-1 px-1">
+                                <div class="col-12 d-flex align-items-center gap-2">
+                                    <span class="text-secondary fw-semibold text-uppercase" style="width: 45px; font-size: 0.9rem;">Email:</span>
+                                    <span class="text-light opacity-90" style=" font-size: 0.9rem;">${registeredEmail}</span>
+                                </div>
+                               
+                            </div>
+                            
+                        </div>
+                    `);
+                }
+
+            }
+        },
+
+        {
+            name: "Email",
+            hidden: true // <-- THIS COMPLETELY HIDES THE COLUMN FROM THE UI [1]
+        },
+    ],
+    data: [],
+    //data: [["", "", "No matching records found.", "", "", "", ""]] ,
+    sort: true,
+    pagination: {
+        limit: 5,
+        summary: true,
+        buttonsCount: 3
+    },
+    fixedHeader: true,
+    // 🌟 ADD THIS BLOCK RIGHT HERE INSIDE THE CONFIGURATION:
+    height: '480px', // Forces the internal JS container logic to hard-lock scroll bounds
+    style: {
+        table: {
+            'display': 'block',
+            'width': '100%'
+        },
+        tbody: {
+            'display': 'flex',
+            'flex-direction': 'column',
+            'gap': '12px',
+            'width': '100%'
+        },
+        tr: {
+            'display': 'block',
+            'width': '100%',
+            'height': 'auto' // Wipes out equal height spreadsheet splitting
+        },
+        td: {
+            'display': 'block',
+            'width': '100%',
+            'height': 'auto',
+            'padding': '0px'
+        }
+    },
+    // style: {
+    //     container: { backgroundColor: '#212529', border: 'none', color: '#f8f9fa' },
+    //     table: { background: '#212529', color: '#f8f9fa', borderCollapse: 'collapse' },
+    //     th: { background: '#1A1D20', color: '#adb5bd', border: '1px solid #495057', padding: '12px 16px' },
+    //     td: { background: '#212529', color: '#f8f9fa', border: '1px solid #373b3e', padding: '12px 16px' }
+    //     // REMOVED internal footer styles to prevent overrides!
+    // },
+    // className: {
+    //     table: 'table mb-0'
+    //     // REMOVED custom paginationButton attributes that were breaking selectors!
+    // }
+}).render(document.getElementById("dgrp-grid"));        
+        
+const sampleEventsData = [
+    {
+        id: 1,
+        title: "Global Tech Summit 2026",
+        date: "Saturday, Oct 14",
+        location: "Main Stage / Convention Center",
+        image: "assets/img/global-tech-summit.jpg",
+        description: "Connect with world-class engineers, project builders, and startup creators shaping the modern landscape of the web."
+    },
+    {
+        id: 2,
+        title: "Summer Beats Music Festival",
+        date: "Saturday, Nov 22",
+        location: "Outdoor Arena Grounds",
+        image: "assets/img/summer-beats.jpg",
+        description: "Experience premium multi-genre music stages, intense lighting arrays, and food courts under open skies."
+    },
+    {
+        id: 3,
+        title: "CodeSprint Hackathon",
+        date: "Friday, Dec 05",
+        location: "Innovation Hub Labs",
+        image: "assets/img/codesprint-hackathon.jpg",
+        description: "A fast-paced 48-hour team coding sprint designed to build real-world software solutions for amazing prizes."
+    }
+];
+
+// 1. Initial execution logic loading cards inside grid bounds
+function displayEvents() {
+    const container = document.getElementById('events-grid-container');
+    container.innerHTML = '';
+
+    sampleEventsData.forEach(event => {
+        const cardMarkup = `
+            <div class="col-12 col-md-4">
+                <div class="card event-card text-white">
+                    <img src="${event.image}" class="card-img-top" alt="${event.title}">
+                    <div class="card-body d-flex flex-column justify-content-between p-4">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <small class="text-danger fw-bold text-uppercase"><i class="bi bi-calendar3"></i> ${event.date}</small>
+                            </div>
+                            <h4 class="card-title fw-bold mb-2">${event.title}</h4>
+                            <p class="text-muted-custom small mb-3"><i class="bi bi-geo-alt"></i> ${event.location}</p>
+                            <p class="card-text text-muted-custom mb-4">${event.description}</p>
+                        </div>
+                        <button class="btn btn-live-red w-100 py-2 rounded-pill mt-auto" onclick="handleRegistration(${event.id})">
+                            <i class="bi bi-pencil-square"></i> Register
+                        </button>
                     </div>
-                `;
-                container.innerHTML += cardMarkup;
-            });
-        }
+                </div>
+            </div>
+        `;
+        container.innerHTML += cardMarkup;
+    });
+}
 
-        // 2. REWRITTEN REGISTRATION TRIGGER FUNCTION
-        function handleRegistration(eventId) {
-            // Find specific matching element attributes within data block
-            const selectedEvent = sampleEventsData.find(e => e.id === eventId);
-            
-            if (!selectedEvent) return;
+// 2. REWRITTEN REGISTRATION TRIGGER FUNCTION
+function handleRegistration(eventId) {
+    // Find specific matching element attributes within data block
+    const selectedEvent = sampleEventsData.find(e => e.id === eventId);
+    
+    if (!selectedEvent) return;
 
-            // Target modal nodes and populate them with the chosen card context details
-            document.getElementById('form-event-id').value = selectedEvent.id;
-            document.getElementById('modal-event-title').innerText = selectedEvent.title;
-            document.getElementById('modal-event-meta').innerHTML = `<i class="bi bi-calendar3"></i> ${selectedEvent.date} | <i class="bi bi-geo-alt"></i> ${selectedEvent.location}`;
+    // Target modal nodes and populate them with the chosen card context details
+    document.getElementById('form-event-id').value = selectedEvent.id;
+    document.getElementById('modal-event-title').innerText = selectedEvent.title;
+    document.getElementById('modal-event-meta').innerHTML = `<i class="bi bi-calendar3"></i> ${selectedEvent.date} | <i class="bi bi-geo-alt"></i> ${selectedEvent.location}`;
 
-            // Initialize and open the Bootstrap modal interface natively using Vanilla JS
-            const targetModalNode = document.getElementById('registrationModal');
-            const bootstrapModalInstance = new bootstrap.Modal(targetModalNode);
-            bootstrapModalInstance.show();
-        }
+    // Initialize and open the Bootstrap modal interface natively using Vanilla JS
+    const targetModalNode = document.getElementById('registrationModal');
+    const bootstrapModalInstance = new bootstrap.Modal(targetModalNode);
+    bootstrapModalInstance.show();
+}
+
+
+//document.addEventListener('DOMContentLoaded', displayEvents);
+
+//==================IMPORTANT DOCUMENT CONTENT LOADED =================//
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('======displaying events')
+    displayEvents();
+
+    jhuang.speak('system loaded!')
 
         // 3. SECURE FORM SUBMIT INTERCEPT HANDLER
-        document.getElementById('registrationForm').addEventListener('submit', function(e) {
-            e.preventDefault(); // Prevent standard page refreshes
+    document.getElementById('registrationForm').addEventListener('submit', function(e) {
+        e.preventDefault(); // Prevent standard page refreshes
 
-            // Read the dynamic capture arguments
-            const registrationPayload = {
-                eventId: document.getElementById('form-event-id').value,
-                fullName: document.getElementById('userName').value,
-                email: document.getElementById('userEmail').value
-            };
+        // Read the dynamic capture arguments
+        const registrationPayload = {
+            eventId: document.getElementById('form-event-id').value,
+            fullName: document.getElementById('userName').value,
+            email: document.getElementById('userEmail').value
+        };
 
-            console.log("Ready to stream payload directly to Express controller route:", registrationPayload);
+        console.log("Ready to stream payload directly to Express controller route:", registrationPayload);
 
-            // Mock success alert message to client interface context
-            alert(`Success!\nRegistered ${registrationPayload.fullName} for Event ID: ${registrationPayload.eventId}`);
+        // Mock success alert message to client interface context
+        alert(`Success!\nRegistered ${registrationPayload.fullName} for Event ID: ${registrationPayload.eventId}`);
 
-            // Programmatically close the open modal container instance
-            const openModalElement = document.getElementById('registrationModal');
-            const instance = bootstrap.Modal.getInstance(openModalElement);
-            instance.hide(); 
+        // Programmatically close the open modal container instance
+        const openModalElement = document.getElementById('registrationModal');
+        const instance = bootstrap.Modal.getInstance(openModalElement);
+        instance.hide(); 
 
-            // Reset inputs ready for alternative transactions
-            this.reset();
-        });
+        // Reset inputs ready for alternative transactions
+        this.reset();
+    });
 
-        //document.addEventListener('DOMContentLoaded', displayEvents);
+    //for cp
+    // Strict real-time character mask for the phone input field
+    document.getElementById('userPhone').addEventListener('input', function (e) {
+        let value = this.value;
 
-        //==================IMPORTANT DOCUMENT CONTENT LOADED =================//
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('======displaying events')
-            displayEvents();
+        // 1. Check if the very first character is a plus sign
+        const hasPlus = value.startsWith('+');
 
-            jhuang.speak('yes')
+        // 2. Strip absolutely everything that is not a raw number digit
+        let cleanNumbers = value.replace(/[^0-9]/g, '');
 
-        });
+        // 3. Reconstruct the string: re-apply the plus only if it was originally there
+        this.value = (hasPlus ? '+' : '') + cleanNumbers;
+    });
+
+    //for email
+    // Automatically removes spaces from the email input in real time
+    document.getElementById('userEmail').addEventListener('input', function () {
+        this.value = this.value.replace(/\s/g, '');
+    });
+
+    //===== for dashboard modal loaded
+    document.addEventListener('click', (e) => {
+        switch (e.target.id) {
+            case 'open-dash-btn': // <-- Change this to the ID of your trigger BUTTON
+                console.log("Opening the dashboard modal view dynamically...");
+                
+                // 1. Locate the physical target modal wrapper element in your HTML
+                const modalTarget = document.getElementById('dashboardModal'); 
+                
+                // 2. Initialize a fresh Bootstrap modal control engine instance
+                const modalInstance = new bootstrap.Modal(modalTarget);
+                
+                // 3. Force the overlay to open smoothly right on the screen
+                modalInstance.show();
+            break;
         
+        }//eofsw
+    })//end doc click
 
-        //for cp
-        // Strict real-time character mask for the phone input field
-        document.getElementById('userPhone').addEventListener('input', function (e) {
-            let value = this.value;
+    /*===========  MODAL LISTENERS BELOW ==============*/
+    // ===== Listener to trigger fetch() when Dashboard Modal is fully shown =====
+    const dashModalElement = document.getElementById('dashboardModal');
 
-            // 1. Check if the very first character is a plus sign
-            const hasPlus = value.startsWith('+');
+    dashModalElement.addEventListener('shown.bs.modal', function () {
+        console.log("Dashboard modal is fully visible. Triggering data fetch...");
+        
+        // Target your inner data container
+        const gridContainer = document.getElementById('dgrp-grid');
+        ///gridContainer.innerHTML = '<span class="text-light opacity-50 small"><i class="bi bi-arrow-clockwise hris-spin me-2"></i>Loading data...</span>';
 
-            // 2. Strip absolutely everything that is not a raw number digit
-            let cleanNumbers = value.replace(/[^0-9]/g, '');
+        //const myIp = "http://192.168.1.16:10000" 
 
-            // 3. Reconstruct the string: re-apply the plus only if it was originally there
-            this.value = (hasPlus ? '+' : '') + cleanNumbers;
-        });
+        toggleLoading(true)
 
-        //for email
-        // Automatically removes spaces from the email input in real time
-        document.getElementById('userEmail').addEventListener('input', function () {
-            this.value = this.value.replace(/\s/g, '');
-        });
+        // Execute your backend API fetch request
+        fetch(`${myIp}/qr/getregistered`) // Change to your specific endpoint later
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();  
+            })
+            .then(serverRows => {
 
-        ///copyright
-        // Automatically injects the current system calendar year into the footer
-        document.getElementById('copyright-year').textContent = new Date().getFullYear();
+                toggleLoading(false)
+                console.log("Data fetched successfully from database:", serverRows );
+                
+                // For now, let's visualize the JSON payload cleanly inside your grid div
+                //gridContainer.innerHTML = `<pre class="text-success small mb-0">${JSON.stringify(data, null, 2)}</pre>`;
+                const formattedRows = serverRows.map(row => [
+                    row.full_name.toUpperCase(), 
+                    row.email
+                ]);
+                
+                // 4. Update the data array inside a single frame swap
+                // If serverRows is empty [], Grid.js draws the dark empty message state instantly
+                //grid.updateConfig({ data: [...formattedRows] }).forceRender();
+                //document.getElementById("dgrp-grid").innerHTML = ""; // Clear any existing content
+                grid.updateConfig({ data: formattedRows }).forceRender();
+                // TODO: Replace the line above later with your custom HTML table loops or grid rendering tool
+            })
+            .catch(error => {
+                toggleLoading(false)
+                console.error("Fetch operation failed:", error);
+                gridContainer.innerHTML = '<span class="text-danger small"><i class="bi bi-exclamation-triangle me-2"></i>Failed to load records.</span>';
+            });
+    });
+
+
+});/// end domcontentloaded
+
+function toggleLoading(isLoading) {
+  const gridContainer = document.getElementById("dgrp-grid");
+  
+  if (isLoading) {
+    // Check if an overlay is already active to prevent duplicates
+    if (document.getElementById("grid-loading-overlay")) return;
+
+    // Create a dark glass overlay container with a Bootstrap spinner and text
+    const overlay = document.createElement("div");
+    overlay.id = "grid-loading-overlay";
+    overlay.className = "d-flex flex-column align-items-center justify-content-center position-absolute top-0 start-0 w-100 h-100";
+    overlay.style.backgroundColor = "rgba(33, 37, 41, 0.75)"; // Matches your #212529 dark theme background
+    overlay.style.zIndex = "1050"; // Places it over sticky headers
+    
+    overlay.innerHTML = `
+      <div class="spinner-border text-info" role="status" style="width: 2.5rem; height: 2.5rem;"></div>
+      <span class="text-white-50 mt-2 small text-uppercase tracking-wider" style="letter-spacing: 1px;">Loading D-Groups...</span>
+    `;
+    
+    // Ensure the parent container can hold absolute positioning bounds
+    gridContainer.style.position = "relative";
+    gridContainer.appendChild(overlay);
+  } else {
+    // Safely strip away the loading layout once data arrives
+    const overlay = document.getElementById("grid-loading-overlay");
+    if (overlay) overlay.remove();
+  }
+}
+
+
+///copyright
+// Automatically injects the current system calendar year into the footer
+document.getElementById('copyright-year').textContent = new Date().getFullYear();
 
