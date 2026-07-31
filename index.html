@@ -59,17 +59,19 @@
                     <li class="nav-item">
                         <a class="nav-link text-light fs-6" href="#events-section">Events</a>
                     </li>
+                    
+                    <li class="nav-item">
+                        <!-- #hrisloadModal -->
+                        <!-- <a class="nav-link text-light fs-6" href="javascript:void(0)" data-bs-toggle="modal">Upload Excel</a> -->
+                        <a class="nav-link text-light fs-6" href="" id="open-xlupload-btn" >Upload Excel</a>
+                    </li>
+                    <!-- Triggers your full-window registration/management screen -->
+                    <li class="nav-item">
+                        <a class="nav-link text-light fs-6" href="" id="open-dash-btn">Dashboard</a>
+                    </li>
                     <!-- Triggers your full-window registration/management screen -->
                     <li class="nav-item">
                         <a class="nav-link text-light fs-6" href="#registrationModal" data-bs-toggle="modal">Login</a>
-                    </li>
-                      <li class="nav-item">
-                        <!-- #hrisloadModal -->
-                        <a class="nav-link text-light fs-6" href="javascript:void(0)" data-bs-toggle="modal">Upload Excel</a>
-                    </li>
-                    <!-- Triggers your full-window registration/management screen -->
-                    <li class="nav-item">
-                        <a class="nav-link text-light fs-6" href="javascript:void(0)" id='open-dash-btn'>Dashboard</a>
                     </li>
                 </ul>
             </div>
@@ -277,21 +279,25 @@
 
                 <!-- Optional Sticky Modal Action Footer Footer -->
                 <div class="modal-footer border-top border-secondary px-4 py-3">
-                    <button type="button" class="btn btn-outline-white px-4 rounded-pill" data-bs-dismiss="modal">Close Overlay</button>
+                    <button type="button" class="btn btn-outline-white px-4 rounded-pill" data-bs-dismiss="modal">CLOSE</button>
                 </div>
 
             </div>
         </div>
     </div>
 
-
     <!-- Bootstrap 5.3 JS Bundle --><!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    
+    <!-- toastify -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
-    <!-- 5. REWRITTEN INTERACTIVE JAVASCRIPT LAYER -->
-    <script src="assets/js/util.min.js?v=1.2"></script> 
+    <!-- socket -->
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js?ver=12"></script>
 
-    <script src="assets/js/main.min.js?v=1.3"></script>
+    <!-- 5. REWRITTEN INTERACTIVE JAVASCRIPT LAYER -->
+    <script src="assets/js/util.min.js?v=1.3"></script> 
+    <script src="assets/js/main.min.js?v=1.4"></script>
+
 </body>
 </html>

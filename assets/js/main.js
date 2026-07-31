@@ -9,12 +9,36 @@ const grid = new gridjs.Grid({
             //height:"100%",
 
             formatter: (cell, row) => {
-                const registeredName = row.cells[0].data;
-                const registeredEmail = row.cells[1].data;
+                // 1. 🔍 DIAGNOSTIC LOG: Press F12 to check your browser console window immediately!
+                console.log("Inspecting single row payload architecture:", row);
 
-                // Escape strings to prevent syntax breakages inside the onclick string
-                const escapedName = registeredName.replace(/'/g, "\\'");
-                const escapedEmail = registeredEmail.replace(/'/g, "\\'");
+                // 2. FETCH VALUES FROM BOTH STRUCTURAL TRACKING LAYERS
+                const sourceObj = row?.data || {};
+                
+                const registeredName   = sourceObj.full_name || row?.cells[0]?.data;
+                const registeredEmail  = sourceObj.email     || row?.cells[1]?.data;
+                
+                // 🌟 TRIPLE-INDEX PROTECTION FOR THE ARRIVAL VALUE:
+                // This evaluates both the direct JSON property name and the hidden cell matrix array positions
+                const registeredArrive = (sourceObj.arrived !== undefined) ? sourceObj.arrived : 
+                                        (row?.cells[2]?.data !== undefined) ? row?.cells[2]?.data : 
+                                        (row?.cells[3]?.data !== undefined) ? row?.cells[3]?.data : null;
+                if (!registeredName) {
+                    return gridjs.html(`<div class="text-muted small p-2">Syncing row node...</div>`);
+                }
+
+                // 3. Clean up your string replacements safely
+                const escapedName  = String(registeredName).replace(/'/g, "\\'");
+                const escapedEmail = String(registeredEmail).replace(/'/g, "\\'");
+
+                // 4. 🌟 RELAXED EQUALITY LOGIC: Coerces types safely (matches 1, "1", or true)
+                const isArrived = registeredArrive == 1 || registeredArrive === true || registeredArrive === "true";
+
+                const statusText  = isArrived ? "Arrived" : "Pending";
+                const badgeColor  = isArrived ? "bg-success text-success" : "bg-danger text-danger";
+                const statusIcon  = isArrived ? "bi-check-circle-fill" : "bi-clock-history";
+                
+                const trackingIdAttr = registeredEmail ? String(registeredEmail).trim() : '';
 
                 // Safety check to ensure we don't format the custom empty state row
                 if ( registeredName === "") {
@@ -37,6 +61,7 @@ const grid = new gridjs.Grid({
                     `);
                     
                 } else {
+
                      return gridjs.html(`
                         <!-- 🌟 FIXED: Added max-width and margin:0 auto to lock width tracking -->
                         <div class="p-3 w-100 mx-auto rounded-3 text-white border border-secondary border-opacity-20 shadow-sm" 
@@ -44,12 +69,15 @@ const grid = new gridjs.Grid({
                             
                             <!-- Header Title -->
                             <div class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom border-secondary border-opacity-30">
-                                <h6 class="m-0 fw-bold tracking-wide" style="color: #0dcaf0; font-size: 0.95rem;">
-                                    ${registeredName}
+                                <h6  class="m-0 fw-bold tracking-wide" style="color: #0dcaf0; font-size: 0.95rem;">
+                                    ${registeredName} 
                                 </h6>
+                                
+                                <!--//
                                 <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger border border-danger border-opacity-20 px-2 py-0.5" style="font-size: 0.65rem; font-weight: 600;">
                                     Attendee
                                 </span>
+                                //-->
                             </div>
 
                             <!-- Metadata Info -->
@@ -57,6 +85,14 @@ const grid = new gridjs.Grid({
                                 <div class="col-12 d-flex align-items-center gap-2">
                                     <span class="text-secondary fw-semibold text-uppercase" style="width: 45px; font-size: 0.9rem;">Email:</span>
                                     <span class="text-light opacity-90" style=" font-size: 0.9rem;">${registeredEmail}</span>
+                                </div>
+                               <div class="col-12 d-flex align-items-center gap-2">
+                                    <span class="text-secondary fw-semibold text-uppercase" style="width: 45px; font-size: 0.7rem;">Status:</span>
+                                    <span class="badge rounded-pill bg-opacity-10 border border-opacity-20 px-2 py-0.5 ${badgeColor}" 
+                                        data-badge-container="${trackingIdAttr}" style="font-size: 0.65rem; font-weight: 600;">
+                                        <i class="bi ${statusIcon} me-1" data-icon-target="${trackingIdAttr}"></i>
+                                        <span id="${trackingIdAttr}">${statusText}</span>
+                                    </span>
                                 </div>
                                
                             </div>
@@ -70,6 +106,10 @@ const grid = new gridjs.Grid({
 
         {
             name: "Email",
+            hidden: true // <-- THIS COMPLETELY HIDES THE COLUMN FROM THE UI [1]
+        },
+        {
+            name: "arrived",
             hidden: true // <-- THIS COMPLETELY HIDES THE COLUMN FROM THE UI [1]
         },
     ],
@@ -203,9 +243,17 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('======displaying events')
     displayEvents();
 
-    jhuang.speak('system loaded!')
+    //connect to socket.io
+    jhuang.connectsocket()
 
-        // 3. SECURE FORM SUBMIT INTERCEPT HANDLER
+    jhuang.speak('yo!')
+
+    // jhuang.socket.on('reset-grid', (data) => {
+    //     console.log('received command to replace', data); // Check the transport
+    // });
+    
+        
+    // 3. SECURE FORM SUBMIT INTERCEPT HANDLER
     document.getElementById('registrationForm').addEventListener('submit', function(e) {
         e.preventDefault(); // Prevent standard page refreshes
 
@@ -255,17 +303,20 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('click', (e) => {
         switch (e.target.id) {
             case 'open-dash-btn': // <-- Change this to the ID of your trigger BUTTON
+                e.preventDefault();
                 console.log("Opening the dashboard modal view dynamically...");
-                
-                // 1. Locate the physical target modal wrapper element in your HTML
-                const modalTarget = document.getElementById('dashboardModal'); 
-                
-                // 2. Initialize a fresh Bootstrap modal control engine instance
-                const modalInstance = new bootstrap.Modal(modalTarget);
-                
-                // 3. Force the overlay to open smoothly right on the screen
-                modalInstance.show();
+                jhuang.modalShow('dashboardModal')
+                return
             break;
+
+            case 'open-xlupload-btn':// open excel upload
+                // 1. Locate the physical target modal wrapper element in your HTML
+                e.preventDefault()
+                console.log('open excel upload...')
+                jhuang.modalShow('hrisloadModal'); 
+                return
+            break;
+
         
         }//eofsw
     })//end doc click
@@ -283,7 +334,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         //const myIp = "http://192.168.1.16:10000" 
 
-        toggleLoading(true)
+        jhuang.toggleLoading('dgrp-grid',true,"Loading pls wait!!!")
 
         // Execute your backend API fetch request
         fetch(`${myIp}/qr/getregistered`) // Change to your specific endpoint later
@@ -295,61 +346,39 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(serverRows => {
 
-                toggleLoading(false)
+                jhuang.toggleLoading('dgrp-grid',false,null)
+
                 console.log("Data fetched successfully from database:", serverRows );
                 
                 // For now, let's visualize the JSON payload cleanly inside your grid div
                 //gridContainer.innerHTML = `<pre class="text-success small mb-0">${JSON.stringify(data, null, 2)}</pre>`;
                 const formattedRows = serverRows.map(row => [
                     row.full_name.toUpperCase(), 
-                    row.email
+                    row.email,
+                    row.arrived
                 ]);
                 
                 // 4. Update the data array inside a single frame swap
                 // If serverRows is empty [], Grid.js draws the dark empty message state instantly
                 //grid.updateConfig({ data: [...formattedRows] }).forceRender();
                 //document.getElementById("dgrp-grid").innerHTML = ""; // Clear any existing content
+                
                 grid.updateConfig({ data: formattedRows }).forceRender();
                 // TODO: Replace the line above later with your custom HTML table loops or grid rendering tool
             })
             .catch(error => {
-                toggleLoading(false)
+                jhuang.toggleLoading('dgrp-grid',false,null)
+                
                 console.error("Fetch operation failed:", error);
                 gridContainer.innerHTML = '<span class="text-danger small"><i class="bi bi-exclamation-triangle me-2"></i>Failed to load records.</span>';
+            
             });
     });
 
 
 });/// end domcontentloaded
 
-function toggleLoading(isLoading) {
-  const gridContainer = document.getElementById("dgrp-grid");
-  
-  if (isLoading) {
-    // Check if an overlay is already active to prevent duplicates
-    if (document.getElementById("grid-loading-overlay")) return;
 
-    // Create a dark glass overlay container with a Bootstrap spinner and text
-    const overlay = document.createElement("div");
-    overlay.id = "grid-loading-overlay";
-    overlay.className = "d-flex flex-column align-items-center justify-content-center position-absolute top-0 start-0 w-100 h-100";
-    overlay.style.backgroundColor = "rgba(33, 37, 41, 0.75)"; // Matches your #212529 dark theme background
-    overlay.style.zIndex = "1050"; // Places it over sticky headers
-    
-    overlay.innerHTML = `
-      <div class="spinner-border text-info" role="status" style="width: 2.5rem; height: 2.5rem;"></div>
-      <span class="text-white-50 mt-2 small text-uppercase tracking-wider" style="letter-spacing: 1px;">Loading D-Groups...</span>
-    `;
-    
-    // Ensure the parent container can hold absolute positioning bounds
-    gridContainer.style.position = "relative";
-    gridContainer.appendChild(overlay);
-  } else {
-    // Safely strip away the loading layout once data arrives
-    const overlay = document.getElementById("grid-loading-overlay");
-    if (overlay) overlay.remove();
-  }
-}
 
 
 ///copyright

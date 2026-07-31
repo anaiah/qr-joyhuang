@@ -1,5 +1,5 @@
-const myIp = "http://192.168.1.16:10000" 
-//const myIp= "https://asn-jtgrp-api.onrender.com"
+//const myIp = "http://192.168.1.16:10000" 
+const myIp= "https://asn-jtgrp-api.onrender.com"
 
 //speech synthesis
 const synth = window.speechSynthesis;
@@ -62,6 +62,7 @@ const jhuang = {
 
     },//end func speak	
   
+    //=============upload registrants excel file =============//
     qrxls:()=>{
         //for upload pdf
         const frmupload = document.getElementById('hrisuploadForm')
@@ -164,6 +165,113 @@ const jhuang = {
             btn.disabled = false;
         }
     },
+
+    modalShow: (elemId) => {
+        // 1. Locate the physical target modal wrapper element in your HTML
+        const modalTarget = document.getElementById(elemId); 
+        
+        // 2. Initialize a fresh Bootstrap modal control engine instance
+        const modalInstance = new bootstrap.Modal(modalTarget);
+        
+        // 3. Force the overlay to open smoothly right on the screen
+        modalInstance.show();
+    },
+
+    
+    toggleLoading: (elemId, isLoading, msg) => {
+
+        const gridContainer = document.getElementById(elemId);
+        
+        if (isLoading) {
+            // Check if an overlay is already active to prevent duplicates
+            if (document.getElementById("grid-loading-overlay")) return;
+
+            // Create a dark glass overlay container with a Bootstrap spinner and text
+            const overlay = document.createElement("div");
+            overlay.id = "grid-loading-overlay";
+            overlay.className = "d-flex flex-column align-items-center justify-content-center position-absolute top-0 start-0 w-100 h-100";
+            overlay.style.backgroundColor = "rgba(33, 37, 41, 0.75)"; // Matches your #212529 dark theme background
+            overlay.style.zIndex = "1050"; // Places it over sticky headers
+            
+            overlay.innerHTML = `
+            <div class="spinner-border text-info" role="status" style="width: 2.5rem; height: 2.5rem;"></div>
+            <span class="text-white-50 mt-2 small text-uppercase tracking-wider" style="letter-spacing: 1px;">${msg}</span>
+            `;
+            
+            // Ensure the parent container can hold absolute positioning bounds
+            gridContainer.style.position = "relative";
+            gridContainer.appendChild(overlay);
+        } else {
+            // Safely strip away the loading layout once data arrives
+            const overlay = document.getElementById("grid-loading-overlay");
+            if (overlay) overlay.remove();
+        }
+    },
+
+    connectsocket:()=>{
+        let authz = []
+            authz.push( 'testID' )
+            authz.push( 'Test User')
+            authz.push( 'qrcoder' )
+            
+            //console.log(authz[1])
+
+            //==HANDSHAKE FIRST WITH SOCKET.IO
+            const userName = { token : authz[1] , emp_id: authz[0], mode: authz[2]}//full name token
+
+            jhuang.socket = io.connect(`${myIp}`, {
+                //withCredentials: true,
+                transports: ['websocket', 'polling'], // Same as server
+                upgrade: true, // Ensure WebSocket upgrade is attempted
+                rememberTransport: false, //Don't keep transport after refresh
+                query:`qrcode=${JSON.stringify(userName)}`
+                // extraHeaders: {
+                //   "osndp-header": "osndp"
+                // }
+            });//========================initiate socket handshake ================
+
+            jhuang.socket.on('reset-grid', (data) => {
+                console.log('received command to replace', data); // Check the transport
+                const targetEmail = data.email; // Example scanned payload
+
+                // 1. Locate the elements using your escaped data attributes
+                const parentBadge = document.querySelector(`[data-badge-container="${CSS.escape(targetEmail)}"]`);
+                const statusIcon  = document.querySelector(`[data-icon-target="${CSS.escape(targetEmail)}"]`);
+                const textSpan    = document.getElementById(targetEmail);
+
+                // 2. Change the BADGE COLOR (Swap Bootstrap dark classes)
+                if (parentBadge) {
+                    // Remove the Pending (Red) styling classes
+                    parentBadge.classList.remove('bg-danger', 'text-danger');
+                    
+                    // Add the Arrived (Green/Cyan) styling classes
+                    parentBadge.classList.add('bg-success', 'text-success'); // Change to bg-info / text-dark if you prefer your cyan theme look
+                }
+
+                // 3. Change the STATUS ICON (Swap Bootstrap Icon glyphs)
+                if (statusIcon) {
+                    // Remove the clock icon class
+                    statusIcon.classList.remove('bi-clock-history');
+                    
+                    // Add the verified checkmark icon class
+                    statusIcon.classList.add('bi-check-circle-fill');
+                }
+
+                // 4. Change the INNER TEXT VALUE
+                if (textSpan) {
+                    textSpan.textContent = "Arrived";
+                }
+
+            });
+    
+            jhuang.socket.on('connect', () => {
+                console.log('Connected to BETTER EDGE Socket.IO server using:', jhuang.socket.io.engine.transport.name); // Check the transport
+            });
+
+            jhuang.socket.on('disconnect', () => {
+                console.log('Disconnected from BETTER EDGE Socket.IO server');
+            });
+    }
 
     //show modal box
 
