@@ -234,6 +234,8 @@ const jhuang = {
                 console.log('received command to replace', data); // Check the transport
                 const targetEmail = data.email; // Example scanned payload
 
+                jhuang.speak( `${data.name} registered!`)
+
                 // 1. Locate the elements using your escaped data attributes
                 const parentBadge = document.querySelector(`[data-badge-container="${CSS.escape(targetEmail)}"]`);
                 const statusIcon  = document.querySelector(`[data-icon-target="${CSS.escape(targetEmail)}"]`);
