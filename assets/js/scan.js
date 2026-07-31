@@ -31,7 +31,7 @@ function onScanSuccess(decodedText, decodedResult) {
         addy.link = decodedText
         //addy.link = updatedUrl
 
-        fetch( updatedUrl  ,{
+        fetch( url  ,{
             //method:'POST',
             //cache:'no-cache',
 
