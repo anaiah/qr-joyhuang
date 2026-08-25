@@ -10,7 +10,7 @@ const grid = new gridjs.Grid({
 
             formatter: (cell, row) => {
                 // 1. 🔍 DIAGNOSTIC LOG: Press F12 to check your browser console window immediately!
-                console.log("Inspecting single row payload architecture:", row);
+                //console.log("Inspecting single row payload architecture:", row);
 
                 // 2. FETCH VALUES FROM BOTH STRUCTURAL TRACKING LAYERS
                 const sourceObj = row?.data || {};
@@ -236,17 +236,77 @@ function handleRegistration(eventId) {
 }
 
 
-//document.addEventListener('DOMContentLoaded', displayEvents);
+//==============BARCODE SCANNER============//
+// 2. The Invisible Hardware Scanner Controller
+const barcodeScanner = {
+    
+    buffer: "",
+    lastKeyTime: Date.now(),
+    threshold: 30,
+
+    init: () => {
+        console.log('*** barcode init() loaded****')
+        window.addEventListener("keydown", (e) => {
+            const currentTime = Date.now();
+            const timeDiff = currentTime - this.lastKeyTime;
+            this.lastKeyTime = currentTime;
+
+            if (e.key === "Enter") {
+            if (this.buffer.length > 0) {
+                this.sendScanToBackend(this.buffer);
+                this.buffer = "";
+            }
+                return;
+            }
+
+            if (timeDiff > this.threshold) {
+                this.buffer = "";
+            }
+
+            if (e.key.length === 1) {
+                this.buffer += e.key;
+            }
+        });
+
+    },//END INIT
+
+    sendScanToBackend: async (rawScannedUrl) => {
+        const sanitizedUrl = encodeURI(rawScannedUrl.trim());
+        console.log("Processing hardware scan:", sanitizedUrl); 
+
+        /*
+        try {
+            // Send the scan payload up to your API server
+            const response = await fetch(sanitizedUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" }
+            });
+
+            if (!response.ok) throw new Error("Database network error");
+            console.log("Scan successfully recorded in database.");
+
+        } catch (error) {
+            console.error("Failed to commit scan:", error);
+        }
+        */
+    }//end sendscan
+}; //end obj bardcoedeScanner
+
+
+//=============END BARCODE SCANNER =========//
 
 //==================IMPORTANT DOCUMENT CONTENT LOADED =================//
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('======displaying events')
+
+    console.log('======DOMContenLoaded====')
     displayEvents();
 
     //connect to socket.io
     jhuang.connectsocket()
 
-    jhuang.speak('yo!')
+    barcodeScanner.init();
+
+    //jhuang.speak('y!')
 
     // jhuang.socket.on('reset-grid', (data) => {
     //     console.log('received command to replace', data); // Check the transport
