@@ -1,4 +1,4 @@
-//const myIp = "http://192.168.1.16:10000" 
+//const myIp = "http://192.168.1.23:10000" 
 const myIp= "https://asn-jtgrp-api.onrender.com"
 
 //speech synthesis
@@ -230,7 +230,7 @@ const jhuang = {
                 // }
             });//========================initiate socket handshake ================
 
-            jhuang.socket.on('reset-grid', (data) => {
+             jhuang.socket.on('reset-grid', (data) => {
                 console.log('received command to replace', data); // Check the transport
                 const targetEmail = data.email; // Example scanned payload
 
@@ -265,16 +265,18 @@ const jhuang = {
                 }
 
             });
+   
     
             jhuang.socket.on('connect', () => {
-                console.log('Connected to BETTER EDGE Socket.IO server using:', jhuang.socket.io.engine.transport.name); // Check the transport
+                console.log('Connected to vertiv Socket.IO server using:', jhuang.socket.io.engine.transport.name); // Check the transport
             });
 
             jhuang.socket.on('disconnect', () => {
-                console.log('Disconnected from BETTER EDGE Socket.IO server');
+                console.log('Disconnected from vertiv Socket.IO server');
             });
     }
 
     //show modal box
 
 }//===end obj
+window.jhuang = jhuang

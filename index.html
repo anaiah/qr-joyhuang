@@ -262,10 +262,36 @@
                 
                 <!-- Modal Body Area -->
                 <div class="modal-body p-4 p-md-5">
+                        <!-- ======================================================================= -->
+                        <!-- 🚀 ADDED HERE: Bulletproof Invisible Scan Input Field Receiver          -->
+                        <!-- ======================================================================= -->
+                        <!-- <input type="text" 
+                            id="scanner-input" 
+                            placeholder="Waiting for hardware scan..." 
+                            autofocus 
+                            style="position: absolute; opacity: 0; pointer-events: none; top: 0; left: 0;" /> -->
+
+                        <!-- 🔍 VISIBLE TEST VERSION: Remove the hidden styling and add a bright green border -->
+                        <input type="text" 
+                            id="scanner-input" 
+                            placeholder="👉 SCAN HERE NOW..." 
+                            autofocus 
+                            class="form-control mb-3 text-dark fw-bold" 
+                            style="background-color: #e2fcd4; border: 2px solid #28a745; z-index: 9999; position: relative;" />
+    
+                        <!-- ======================================================================= -->
+
+
                     <!-- Context Description Optional Sub-heading -->
                     <div class="mb-4">
-                        <h6 class="fw-bold mb-1">Master Records</h3>
-                        <p class="text-light opacity-75 small mb-0">Showing registered attendees.</p>
+                        <h6 class="fw-bold mb-1">Master Registration</h3>
+                        <p class="text-light opacity-75 small mb-1">Showing registered attendees.</p>
+                        <button type="button" class="btn btn-primary btn-sm " id="test-printer-btn" >
+                            <i class="bi bi-check-circle-fill me-1"></i> Test Printer
+                        </button>
+                        <button type="button" class="btn btn-info btn-sm " id="connect-printer-btn" >
+                            <i class="bi bi-check-circle-fill me-1"></i> Connect Printer
+                        </button>
                     </div>
 
                     <!-- Your Required Table Data Grid Container Wireframe -->
@@ -295,9 +321,14 @@
     <!-- socket -->
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js?ver=12"></script>
 
-    <!-- 5. REWRITTEN INTERACTIVE JAVASCRIPT LAYER -->
-    <script src="assets/js/util.js?v=1.3"></script> 
-    <script src="assets/js/main.js?v=1.4"></script>
+    <!-- printer -->
+    <!-- <script src="https://unpkg.com/@mmote/niimbluelib@VERSION/dist/umd/niimbluelib.min.js"></script>
+    <script src="https://unpkg.com/@mmote/niimbluelib@VERSION/dist/umd/niimbluelib.min.js"></script>
+    <script src="https://unpkg.com/@mmote/niimbluelib@VERSION/dist/umd/niimbluelib.min.js"></script> -->
 
+    <!-- 5. REWRITTEN INTERACTIVE JAVASCRIPT LAYER -->
+    <script src="assets/js/util.js?v=1.5"></script> 
+    <script src="assets/js/main.js?v=2.0"></script>
+ 
 </body>
 </html>

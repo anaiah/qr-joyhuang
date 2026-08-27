@@ -91,8 +91,8 @@ const scan = {
     authz.push( 'qrcode' )
     
     //console.log(authz[1])
-    //const myIp = "http://192.168.1.16:10000" 
-    const myIp= "https://asn-jtgrp-api.onrender.com"
+    const myIp = "http://192.168.1.16:10000" 
+    //const myIp= "https://asn-jtgrp-api.onrender.com"
 
 
     //==HANDSHAKE FIRST WITH SOCKET.IO
