@@ -303,18 +303,6 @@ const barcodeScanner = {
                 return;
             }
 
-            if (scanTimeoutTracker) clearTimeout(scanTimeoutTracker);
-
-            scanTimeoutTracker = setTimeout(() => {
-                // 💡 THE FIX: If the safety buffer expires, make sure it only processes 
-                // a scan if the buffer is actually long enough to be a genuine QR code!
-                if (scannedBuffer.length > 3) {
-                    console.log("Processing stream from timeout safety buffer:", scannedBuffer);
-                    barcodeScanner.onQRCodeScannedSuccess(scannedBuffer);
-                }
-                scannedBuffer = ""; // Flush memory
-            }, 50);
-
             // FIX B: Explicitly target the object name 'barcodeScanner' to safely access the buffers
             const currentTime = Date.now();
             const timeDiff = currentTime - barcodeScanner.lastKeyTime;
