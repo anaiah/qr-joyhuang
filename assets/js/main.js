@@ -343,23 +343,24 @@ const barcodeScanner = {
 
           // 1. Capture the raw input from your notepad verification layout
         const incomingUrl = rawScannedUrl.trim(); 
-        const myLocalIpAddress = `${myIp}`; // http://192.168.1.23:10000
+
+        console.log(incomingUrl, "=== Raw Scanned URL Received ===");
+        
+        const myNewURL = `${myIp}/qr/mark-attendance/${incomingUrl}`; // http://192.168.1.23:10000
 
         // 2. Perform the domain routing swap cleanly
-        let localRoutePath = incomingUrl.replace("https://asn-jtgrp-api.onrender.com", myLocalIpAddress);
-        localRoutePath = localRoutePath.replace('undefined', '');
-
+        
         // 3. CRUCIAL FIX: Encode the URL correctly so spaces like "Katrina Uy" don't break the fetch!
         // This converts spaces into "%20", preventing the 404 truncation drop
-        const sanitizedUrl = encodeURI(localRoutePath); 
+        const sanitizedUrl = encodeURI(myNewURL); 
 
-         let cleanUrl = sanitizedUrl.replace(/\/$/, "");
+        // let cleanUrl = sanitizedUrl.replace(/\/$/, "");
          
         console.log("Fixed Safe Local Network Path Assembled:", sanitizedUrl);
-        
+                
         try {
             // Send the scan payload up to your API server
-            const response = await fetch(cleanUrl, {
+            const response = await fetch(sanitizedUrl, {
                 method: "GET",
                 headers: { "Content-Type": "application/json" }
             });
