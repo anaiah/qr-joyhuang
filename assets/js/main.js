@@ -652,36 +652,7 @@ const barcodeScanner = {
 
             document.getElementById('scanner-input').focus();
         
-             // ====================================================
-            // THE 20-SECOND BYPASS: FORCE FIRMWARE ACKNOWLEDGEMENT
-            // ====================================================
-            // try {
-            //     console.log("Sending initialization handshake to unlock B3S firmware...");
-                
-            //     // 1. Force the internal connection state engine to synchronize
-            //     if (typeof window.niimbotClient.initialize === 'function') {
-            //         await window.niimbotClient.initialize();
-            //     }
-
-            //     // 2. Transmit a low-level heartbeat packet frame directly to the command queue.
-            //     // Requesting the print density levels forces the printer to respond on a 
-            //     // protected hardware register, which tricks the B3S into staying awake indefinitely.
-            //     if (typeof window.niimbotClient.getHeartbeatData === 'function') {
-            //         await window.niimbotClient.getHeartbeatData();
-            //     } else {
-            //         // Fallback: poll density profile configs directly to reset the 20s gate
-            //         await window.niimbotClient.getPrinterInfo();
-            //     }
-                
-            //     console.log("🚀 Connection verified by printer! 20s idle timeout has been beaten.");
-                
-            //     // 3. Now that the link is unlocked, start an aggressive background 
-            //     // ping loop every 10 seconds to keep the line hot.
-            //     barcodeScanner.startHeartbeat();
-
-            // } catch (fail) {
-            //     console.warn("Handshake warning (Safe to ignore if printer stays alive):", fail);
-            // }
+          
         }); 
         //==============END DEVICE ON CONNECT =======//
 
@@ -880,7 +851,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     script.onerror = () => console.error("❌ Failed to download library from CDN.");
     document.head.appendChild(script);
     
-    console.log('====== santized DOMContenLoaded====')
+    console.log('====== sanitized github Hostinger DOMContenLoaded====')
     displayEvents();
 
     //connect to socket.io util.js
