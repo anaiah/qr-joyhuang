@@ -116,240 +116,61 @@
 /* ==========================================================================
    1. Master Envelope Layout Matrix
    ========================================================================== */
-.gridjs-container {
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-    color: #f8f9fa !important;
-}
+/* ========================================================
+   🖨️ WINDOWS PRINT PREVIEW ISOLATED CONTRAST THEME 
+   Add this at the bottom of your stylesheet to clear dark mode rules!
+   ======================================================== */
 
-.gridjs-wrapper {
-    height: 480px !important;       /* Reduced from 480px since the button was removed */
-    max-height: 50vh !important;
-    overflow-y: auto !important;     /* Keeps smooth scrolling active */
-    background-color: transparent !important; 
-    border: none !important;                  
+/* ========================================================
+   🖨️ WINDOWS PRINT PREVIEW DESIGN REGULATION LAYER
+   ======================================================== */
+.gridjs-container,
+.gridjs-wrapper,
+.gridjs-table,
+.gridjs-tr,
+.gridjs-td,
+.gridjs-footer {
+    background-color: #FFFFFF !important;
+    background: #FFFFFF !important;
+    color: #000000 !important;
+    font-family: Arial, Helvetica, sans-serif !important;
+    border-radius: 0px !important;
     box-shadow: none !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    overflow-x: hidden !important;   /* Blocks sideways tracking completely */
-    box-sizing: border-box !important;
 }
 
-/* --- Custom Scrollbar styling matching your sleek dark layout vibe --- */
-.gridjs-wrapper::-webkit-scrollbar {
-    width: 6px;
-}
-.gridjs-wrapper::-webkit-scrollbar-track {
-    background: #0b0c10;
-}
-.gridjs-wrapper::-webkit-scrollbar-thumb {
-    background: #2e3039;
-    border-radius: 10px;
-}
-.gridjs-wrapper::-webkit-scrollbar-thumb:hover {
-    background: #dc3545; /* Turns red when hovered over */
+/* Wipes out native cell padding and blue table header bars entirely */
+.gridjs-th {
+    display: none !important; /* Completely hides the "Name" column header bar to create a seamless layout page look */
 }
 
-/* FORCES ROWS TO SEPARATE: Overwrites table grid formulas to behave as independent blocks */
-.gridjs-table {
-    display: block !important; /* Breaks out of grid spreadsheet formulas */
-    background-color: transparent !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    border: none !important;
-    box-sizing: border-box !important;
-}
-
-/* ==========================================================================
-   2. Core Table Body Conversion (The Flex Column Stack)
-   ========================================================================== */
-.gridjs-container .gridjs-tbody {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 16px !important; /* Perfect gap separating your individual cards */
-    background-color: transparent !important; 
-    background-image: none !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-}
-
-/* HIDDEN HEADERS: Keeps standard grid table headers fully hidden from your card interface */
-.gridjs-thead, 
-.gridjs-container th.gridjs-th {
-    display: none !important;
-    width: 0px !important;
-    height: 0px !important;
-    padding: 0 !important;
-}
-
-/* Forces cells to span 100% width of the modal container instead of relying on grid math */
 .gridjs-td {
+    padding: 0px !important;
     border: none !important;
-    background-color: transparent !important; 
-    padding: 0px !important; 
-    width: 100% !important;
-    max-width: 100% !important;
-    display: block !important; /* Forces row cell elements to behave like a standard div block */
-    box-sizing: border-box !important;
+    border-bottom: 1px dashed #000000 !important; /* Dotted tear lines between attendee badges */
 }
 
-/* HARD HARDWARE PURGE FOR HIDDEN COLUMNS */
-.gridjs-tr td:not(:first-child),
-.gridjs-tr th:not(:first-child) {
-    display: none !important;
-    width: 0px !important;
-    max-width: 0px !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    border: none !important;
+/* Clear the browser search field aesthetics */
+.gridjs-search,
+.gridjs-search-input {
+    font-family: Arial, sans-serif !important;
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+    border: 1px solid #000000 !important;
+    border-radius: 0px !important;
 }
 
-/* ==========================================================================
-   3. Row Display Layout & Width Alignment Core Fix
-   ========================================================================== */
-.gridjs-tbody .gridjs-tr {
-    position: relative !important;
-    background-color: transparent !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    display: block !important; /* Stops rows from turning into flat tables columns */
-    box-sizing: border-box !important;
-    float: none !important; /* Prevents text alignment breakage artifact layouts */
+/* Monochrome Pagination Selector Styling */
+.gridjs-pagination .gridjs-pages button {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+    border: 1px solid #000000 !important;
+    border-radius: 0px !important;
+}
+.gridjs-pagination .gridjs-pages button.gridjs-currentPage {
+    background-color: #000000 !important;
+    color: #FFFFFF !important;
 }
 
-/* ==========================================================================
-   4. Glassmorphism Card Core Structure & Hover Dynamics
-   ========================================================================== */
-.glass-card-inner {
-    background: rgba(255, 255, 255, 0.04) !important; 
-    backdrop-filter: blur(16px) !important;
-    -webkit-backdrop-filter: blur(16px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 12px !important;
-    padding: 16px !important; 
-    box-sizing: border-box !important;
-    width: 100% !important; /* Locks layout boundaries to exact width matches */
-    transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1), 
-                border-color 0.2s ease, 
-                box-shadow 0.2s ease !important;
-}
-
-/* Smooth hover animations for the "Wow" factor */
-.gridjs-tr:hover .glass-card-inner {
-    background: rgba(255, 255, 255, 0.07) !important;
-    border-color: rgba(13, 202, 240, 0.4) !important; /* Bootstrap Info cyan glow */
-    transform: translateY(-2px); 
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), 
-                0 0 12px rgba(13, 202, 240, 0.1) !important;
-}
-
-/* Custom Empty State Support Layout Configuration */
-.gridjs-container td.gridjs-message {
-    background-color: #212529 !important; 
-    color: #f8f9fa !important;            
-    border: 1px solid #495057 !important;              
-    text-align: center !important;
-    font-size: 0.9rem !important;          
-    font-weight: 500 !important;
-    padding: 50px 16px !important;
-    border-radius: 12px;       
-    display: block !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-}
-
-.gridjs-tr:has(div[style*="position: absolute"]) td {
-    border: none !important;
-}
-
-/* ==========================================================================
-   5. Table Footer Layout Structure
-   ========================================================================== */
-.gridjs-container .gridjs-footer {
-    background-color: #1A1D20 !important;
-    background-image: none !important;
-    border-top: 1px solid #2e3039 !important;
-    box-shadow: none !important;
-    color: #adb5bd !important;
-    padding: 14px 16px !important;
-    border-radius: 0 0 12px 12px;
-    width: 100% !important;
-    box-sizing: border-box !important;
-}
-
-.gridjs-container .gridjs-pagination .gridjs-summary {
-    color: #adb5bd !important;
-    font-size: 0.85rem !important;
-}
-
-/* ==========================================================================
-   6. Action Navigation Buttons (Pagination Control UI Elements)
-   ========================================================================== */
-.gridjs-container .gridjs-pagination .gridjs-pages button {
-    background-color: transparent !important;
-    background-image: none !important;
-    border: 1px solid #495057 !important;
-    color: #f8f9fa !important;
-    padding: 4px 12px !important;
-    font-size: 0.8rem !important;
-    border-radius: 6px !important;
-    cursor: pointer !important;
-    margin: 0 2px !important;
-    transition: all 0.15s ease;
-}
-
-.gridjs-container .gridjs-pagination .gridjs-pages button.gridjs-currentPage {
-    background-color: #495057 !important;
-    border-color: #6c757d !important;
-    color: #ffffff !important;
-    font-weight: bold !important;
-}
-
-.gridjs-container .gridjs-pagination .gridjs-pages button:hover:not(.gridjs-currentPage):not(:disabled) {
-    background-color: #2c3034 !important;
-    color: #ffffff !important;
-}
-
-.gridjs-container .gridjs-pagination .gridjs-pages button:disabled {
-    background-color: transparent !important;
-    color: #495057 !important;
-    border-color: #343a40 !important;
-    cursor: not-allowed !important;
-}
-/* ==========================================================================
-   FINAL STATUS QUO RESOLUTION OVERRIDE
-   ========================================================================== */
-
-/* Forces the absolute root elements of the grid rows to stack tightly */
-tr.gridjs-tr {
-    display: flex !important;
-    flex-direction: column !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-    height: auto !important; /* Wipes out the equal height distribution calculation bug */
-}
-
-/* Forces the table cell envelope to expand fully and wrap around your inner card layout height */
-td.gridjs-td {
-    display: block !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-    height: auto !important; /* Ensures the cell matches the card's exact dimensions */
-    padding: 0 !important;
-}
-/* Restricts outer boundary containers from stretching out of bounds */
-.gridjs {
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-}
-
-.gridjs-table {
-    box-sizing: border-box !important;
-}
 /* command button pulsate */
 @keyframes pulse {
   0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); }

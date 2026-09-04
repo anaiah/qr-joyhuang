@@ -57,7 +57,7 @@
                 <!-- AFTER (Pushed Far Right) -->
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-3 align-items-lg-center">
                     <li class="nav-item">
-                        <a class="nav-link text-light fs-6" href="#events-section">Events</a>
+                        <a class="nav-link text-light fs-6" href="javascript:void(0)" onclick="jhuang.scrollsTo('events-section')">Events</a>
                     </li>
                     
                     <li class="nav-item">
@@ -70,9 +70,9 @@
                         <a class="nav-link text-light fs-6" href="" id="open-dash-btn">Dashboard</a>
                     </li>
                     <!-- Triggers your full-window registration/management screen -->
-                    <li class="nav-item">
+                    <!-- <li class="nav-item">
                         <a class="nav-link text-light fs-6" href="#registrationModal" data-bs-toggle="modal">Login</a>
-                    </li>
+                    </li> -->
                 </ul>
             </div>
         </div>
@@ -136,7 +136,7 @@
     <!-- 4. DYNAMIC REGISTRATION MODAL -->
     <!-- DYNAMIC REGISTRATION MODAL WITH VISIBLE LABELS -->
     <div class="modal fade" id="registrationModal" tabindex="-1" aria-labelledby="registrationModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered modal-lg"> <!-- Changed to modal-lg for a balanced 2-column layout -->
             <div class="modal-content border-secondary" style="background-color: #1f2128; color: #ffffff;">
                 <div class="modal-header border-bottom border-secondary">
                     <h5 class="modal-title fw-bold" id="registrationModalLabel">Event Registration</h5>
@@ -148,45 +148,92 @@
                         <small id="modal-event-meta" class="text-danger fw-bold text-uppercase"></small>
                     </div>
 
-                    <form id="registrationForm">
+                    <!-- 💡 Form Submit Rule: Captures form submissions, stops page refresh, and runs your custom target handler function -->
+                    <form id="registrationForm" onsubmit="event.preventDefault(); barcodeScanner.register(); return false;">
                         <input type="hidden" id="form-event-id" name="eventId">
 
-                        <!-- Full Name Label (Changed to text-light) -->
-                        <div class="mb-3">
-                            <label for="userName" class="form-label small fw-bold text-uppercase text-light">Full Name</label>
-                            <input type="text" class="form-control bg-dark text-white border-secondary" id="userName" placeholder="John Doe" required>
+                        <div class="row">
+                            <!-- First Name Input Row -->
+                            <div class="col-md-6 mb-3">
+                                <label for="firstName" class="form-label small fw-bold text-uppercase text-light">First Name</label>
+                                <input type="text" class="form-control bg-dark text-white border-secondary" id="firstName" placeholder="John" required>
+                            </div>
+
+                            <!-- Last Name Input Row -->
+                            <div class="col-md-6 mb-3">
+                                <label for="lastName" class="form-label small fw-bold text-uppercase text-light">Last Name</label>
+                                <input type="text" class="form-control bg-dark text-white border-secondary" id="lastName" placeholder="Doe" required>
+                            </div>
                         </div>
 
-                        <!-- Email Address Label (Changed to text-light) -->
-                        <!-- Email Address with Native and Custom RegEx Validation -->
-                        <div class="mb-3">
-                            <label for="userEmail" class="form-label small fw-bold text-uppercase text-light">Email Address</label>
-                            <input 
-                                type="email" 
-                                class="form-control bg-dark text-white border-secondary" 
-                                id="userEmail" 
-                                placeholder="johndoe@example.com" 
-                                pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-                                title="Please enter a valid email address (e.g., name@domain.com)."
-                                required
-                            >
+                        <div class="row">
+                            <!-- Email Input Row -->
+                            <div class="col-md-6 mb-3">
+                                <label for="userEmail" class="form-label small fw-bold text-uppercase text-light">Email Address</label>
+                                <input 
+                                    type="email" 
+                                    class="form-control bg-dark text-white border-secondary" 
+                                    id="userEmail" 
+                                    placeholder="johndoe@example.com" 
+                                    pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                                    title="Please enter a valid email address (e.g., name@domain.com)."
+                                    required
+                                >
+                            </div>
+
+                            <!-- Business Phone Input Row -->
+                            <div class="col-md-6 mb-3">
+                                <label for="userPhone" class="form-label small fw-bold text-uppercase text-light">Business Phone</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control bg-dark text-white border-secondary" 
+                                    id="userPhone" 
+                                    placeholder="+639123456789 or 09123456789" 
+                                    pattern="^\+?[0-9]+$" 
+                                    title="Phone number must only contain digits and can optionally start with a '+' sign."
+                                    required
+                                >
+                            </div>
                         </div>
 
+                        <div class="row">
+                            <!-- Company Name Input Row -->
+                            <div class="col-md-6 mb-3">
+                                <label for="userCompany" class="form-label small fw-bold text-uppercase text-light">Company</label>
+                                <input type="text" class="form-control bg-dark text-white border-secondary" id="userCompany" placeholder="Acme Corp" required>
+                            </div>
 
-                        <!-- CP Number Label (Changed to text-light) -->
-                        <!-- CP Number Label & Input with Strict Validation Pattern -->
+                            <!-- Event Name Input Row -->
+                            <div class="col-md-6 mb-3">
+                                <label for="eventNameInput" class="form-label small fw-bold text-uppercase text-light">Event Name</label>
+                                <input type="text" class="form-control bg-dark text-white border-secondary" id="eventNameInput" placeholder="Tech Summit 2026" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Country Select Box Component (Connected directly to your custom async JS loop population target) -->
+                            <div class="col-md-6 mb-3">
+                                <label for="country-select" class="form-label small fw-bold text-uppercase text-light">Country</label>
+                                <select id="country-select" class="form-select bg-dark text-white border-secondary" required>
+                                    <option value="" selected disabled>Select your country...</option>
+                                </select>
+                            </div>
+
+                            <!-- Job Function Input Row -->
+                            <div class="col-md-6 mb-3">
+                                <label for="jobFunction" class="form-label small fw-bold text-uppercase text-light">Job Function</label>
+                                <input type="text" class="form-control bg-dark text-white border-secondary" id="jobFunction" placeholder="IT Manager / Coordinator" required>
+                            </div>
+                        </div>
+
+                        <!-- Industry Select Box Component (Connected directly to your offline JS memory loop population target) -->
                         <div class="mb-4">
-                            <label for="userPhone" class="form-label small fw-bold text-uppercase text-light">CP Number (Mobile)</label>
-                            <input 
-                                type="text" 
-                                class="form-control bg-dark text-white border-secondary" 
-                                id="userPhone" 
-                                placeholder="+639123456789 or 09123456789" 
-                                pattern="^\+?[0-9]+$" 
-                                title="Phone number must only contain digits and can optionally start with a '+' sign."
-                                required
-                            >
+                            <label for="industry-select" class="form-label small fw-bold text-uppercase text-light">Industry</label>
+                            <select id="industry-select" class="form-select bg-dark text-white border-secondary" required>
+                                <option value="" selected disabled>Select your industry...</option>
+                            </select>
                         </div>
+
                         <button type="submit" class="btn btn-live-red w-100 py-2 rounded-pill fw-bold">
                             <i class="bi bi-check-circle-fill me-1"></i> Confirm Registration
                         </button>
@@ -290,15 +337,25 @@
                             <i class="bi bi-check-circle-fill me-1"></i> Test Printer
                         </button>
                         <button type="button" class="btn btn-info btn-sm " id="connect-printer-btn" >
-                            <i class="bi bi-check-circle-fill me-1"></i> Connect Printer
+                            <i class="bi bi-check-circle-fill me-1"></i> 🖨️ Connect Printer
                         </button>
                     </div>
 
                     <!-- Your Required Table Data Grid Container Wireframe -->
-                    <div class="table-responsive rounded shadow-sm border border-secondary" style="background-color: #1f2128;">
-                        <div id="dgrp-grid" class="p-3">
-                            <!-- Data grid elements or library rendering targets go here -->
-                            <span class="text-muted small">Loading relational grid matrix components...</span>
+
+                    <!-- Isolate the wrapper container to completely block old CSS rules -->
+                    <div class="table-responsive print-preview-isolated-zone" 
+                        style="background-color: #FFFFFF !important; 
+                                font-family: Arial, Helvetica, sans-serif !important; 
+                                color: #000000 !important;
+                                border: 1px solid #000000 !important; 
+                                padding: 15px; 
+                                box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.05) !important;">
+                                
+                        <div id="dgrp-grid">
+                            <span style="color: #666666 !important; font-family: Arial, sans-serif !important; font-size: 14px; font-style: italic;">
+                                Loading relational grid matrix components...
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -326,9 +383,9 @@
     <script src="https://unpkg.com/@mmote/niimbluelib@VERSION/dist/umd/niimbluelib.min.js"></script>
     <script src="https://unpkg.com/@mmote/niimbluelib@VERSION/dist/umd/niimbluelib.min.js"></script> -->
 
-    <!-- 5. REWRITTEN INTERACTIVE JAVASCRIPT LAYER -->
-    <script src="assets/js/util.min.js?v=2.1"></script> 
-    <script src="assets/js/main.min.js?v=2.1"></script>
+    <!-- 5. REWRITTEN INTERACTIVE JAVASCRIPT LAYER these below are .min.js -->
+    <script src="assets/js/util.min.js?v=2.2"></script> 
+    <script src="assets/js/main.min.js?v=2.2"></script>
  
 </body>
 </html>

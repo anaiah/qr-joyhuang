@@ -12,177 +12,151 @@ const grid = new gridjs.Grid({
             return ''; 
         }
     },
-    
     columns: [
         {
             name: "Name",
             width: "100%",
+            //height:"100%",
+
             formatter: (cell, row) => {
-                // FETCH VALUES FROM BOTH STRUCTURAL TRACKING LAYERS
+                // 1. 🔍 DIAGNOSTIC LOG: Press F12 to check your browser console window immediately!
+                //console.log("Inspecting single row payload architecture:", row);
+
+                // 2. FETCH VALUES FROM BOTH STRUCTURAL TRACKING LAYERS
                 const sourceObj = row?.data || {};
                 
                 const registeredName   = sourceObj.full_name || row?.cells[0]?.data;
                 const registeredEmail  = sourceObj.email     || row?.cells[1]?.data;
-                const registeredCompany = sourceObj.company   || row?.cells[3]?.data;
-                const registeredEvent   = sourceObj.event     || row?.cells[4]?.data;
-                                
+                
+                // 🌟 TRIPLE-INDEX PROTECTION FOR THE ARRIVAL VALUE:
+                // This evaluates both the direct JSON property name and the hidden cell matrix array positions
                 const registeredArrive = (sourceObj.arrived !== undefined) ? sourceObj.arrived : 
                                         (row?.cells[2]?.data !== undefined) ? row?.cells[2]?.data : 
                                         (row?.cells[3]?.data !== undefined) ? row?.cells[3]?.data : null;
-
                 if (!registeredName) {
-                    return gridjs.html(`<div style="font-family: Arial, sans-serif; color: #666666; font-size: 0.85rem; padding: 8px;">Syncing row node...</div>`);
+                    return gridjs.html(`<div class="text-muted small p-2">Syncing row node...</div>`);
                 }
 
-                // RELAXED EQUALITY LOGIC
+                // 3. Clean up your string replacements safely
+                const escapedName  = String(registeredName).replace(/'/g, "\\'");
+                const escapedEmail = String(registeredEmail).replace(/'/g, "\\'");
+
+                // 4. 🌟 RELAXED EQUALITY LOGIC: Coerces types safely (matches 1, "1", or true)
                 const isArrived = registeredArrive == 1 || registeredArrive === true || registeredArrive === "true";
+
                 const statusText  = isArrived ? "Arrived" : "Pending";
-                const badgeBorder = isArrived ? "border: 1px solid #000000; color: #000000;" : "border: 1px solid #777777; color: #777777; font-style: italic;";
+                const badgeColor  = isArrived ? "bg-success text-success" : "bg-danger text-danger";
                 const statusIcon  = isArrived ? "bi-check-circle-fill" : "bi-clock-history";
                 
                 const trackingIdAttr = registeredEmail ? String(registeredEmail).trim() : '';
 
-                // 💡 PREPARE NAME ARGUMENTS FOR THE PRINTING FUNCTION
-                // 1. Separate the first name automatically (split string by spaces and grab item 0)
-                const derivedFirstName = String(registeredName).trim().split(" ")[0];
-                
-                // 2. Escape any single quotes in the strings so they don't crash your onclick attribute string parsing!
-                const safeFirstName = derivedFirstName.replace(/'/g, "\\'");
-                const safeFullName  = String(registeredName).replace(/'/g, "\\'");
-
                 // Safety check to ensure we don't format the custom empty state row
-                if (registeredName === "") {
+                if ( registeredName === "") {
+
                     return gridjs.html(`
-                        <div style="position: absolute; left: 0; width: 100%; text-align: center; color: #666666; font-family: Arial, sans-serif; font-size: 0.9rem; font-weight: 500; padding: 40px 0; background-color: #FFFFFF; pointer-events: none; border-bottom: 1px solid #000000;">
+                        <div style="
+                        position: absolute;
+                        left: 0;
+                        width: 100%;
+                        text-align: center;
+                        color: #adb5bd;
+                        font-size: 0.9rem;
+                        font-weight: 500;
+                        padding: 40px 0;
+                        background-color: #212529;
+                        pointer-events: none;
+                        ">
                         No matching records found.
                         </div>
                     `);
+                    
                 } else {
+
                      return gridjs.html(`
-                        <!-- PRINT PREVIEW CONTAINER LAYOUT -->
-                        <div class="p-3 w-100 mx-auto" 
-                             style="background-color: #FFFFFF; max-width: 100%; box-sizing: border-box; font-family: Arial, Helvetica, sans-serif;">
+                        <!-- 🌟 FIXED: Added max-width and margin:0 auto to lock width tracking -->
+                        <div class="p-3 w-100 mx-auto rounded-3 text-white border border-secondary border-opacity-20 shadow-sm" 
+                             style="background-color: #1f2128; max-width: 100%; box-sizing: border-box;">
                             
-                            <!-- Header Title Line Layout Matrix -->
-                            <div class="d-flex justify-content-between align-items-center pb-1" style="">
-                                <h6 class="m-0 fw-bold tracking-wide" style="color: #000000; font-family: Arial, sans-serif; font-size: 1.05rem;">
-                                    ${registeredName.toUpperCase()} 
+                            <!-- Header Title -->
+                            <div class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom border-secondary border-opacity-30">
+                                <h6  class="m-0 fw-bold tracking-wide" style="color: #0dcaf0; font-size: 0.95rem;">
+                                    ${registeredName} 
                                 </h6>
                                 
-                                <!-- 💡 THE PRINT FUNCTION BUTTON ADDITION:
-                                     Maps your parameters straight to printSeminarBadge() inside the button gesture! -->
-                                <button onclick="barcodeScanner.printSeminarBadge('${safeFirstName}', '${safeFullName}')"
-                                        class="btn btn-sm btn-outline-dark"
-                                        style="font-family: Arial, sans-serif; font-size: 0.75rem; font-weight: bold; border-radius: 0px; padding: 3px 10px; border: 1px solid #000000; background-color: #FFFFFF; color: #000000;">
-                                    🖨️ RE-PRINT BADGE
-                                </button>
+                                <!--//
+                                <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger border border-danger border-opacity-20 px-2 py-0.5" style="font-size: 0.65rem; font-weight: 600;">
+                                    Attendee
+                                </span>
+                                //-->
                             </div>
 
-                            <!-- Metadata Info Matrix -->
-                            <div class="row g-1 px-1" style="color: #000000; font-family: Arial, sans-serif;">
+                            <!-- Metadata Info -->
+                            <div class="row g-1 px-1">
                                 <div class="col-12 d-flex align-items-center gap-2">
-                                    <span class="fw-bold text-uppercase" style="width: 55px; font-size: 0.8rem; color: #444444;">Email:</span>
-                                    <span style="font-size: 0.9rem; color: #000000;">${registeredEmail}</span>
+                                    <span class="text-secondary fw-semibold text-uppercase" style="width: 45px; font-size: 0.9rem;">Email:</span>
+                                    <span class="text-light opacity-90" style=" font-size: 0.9rem;">${registeredEmail}</span>
                                 </div>
-                                
-                                <div class="col-12 d-flex align-items-center gap-2">
-                                    <span class="fw-bold text-uppercase" style="width: 55px; font-size: 0.8rem; color: #444444;">Co.:</span>
-                                    <span style="font-size: 0.9rem; color: #000000;"> ${registeredCompany}</span>
-                                </div>
-                                
-                                <div class="col-12 d-flex align-items-center gap-2">
-                                    <span class="fw-bold text-uppercase" style="width: 55px; font-size: 0.8rem; color: #444444;">Event:</span>
-                                    <span style="font-size: 0.9rem; color: #000000;">${registeredEvent}</span>
-                                </div>
-
-                                <div class="col-12 d-flex align-items-center gap-2">
-                                    <span class="fw-bold text-uppercase" style="width: 55px; font-size: 0.8rem; color: #444444;">Status:</span>
-                                    <span class="px-2 py-0.5" 
-                                        data-badge-container="${trackingIdAttr}" 
-                                        style="font-size: 0.7rem; font-weight: bold; font-family: Arial, sans-serif; text-transform: uppercase; ${badgeBorder}">
+                               <div class="col-12 d-flex align-items-center gap-2">
+                                    <span class="text-secondary fw-semibold text-uppercase" style="width: 45px; font-size: 0.7rem;">Status:</span>
+                                    <span class="badge rounded-pill bg-opacity-10 border border-opacity-20 px-2 py-0.5 ${badgeColor}" 
+                                        data-badge-container="${trackingIdAttr}" style="font-size: 0.65rem; font-weight: 600;">
                                         <i class="bi ${statusIcon} me-1" data-icon-target="${trackingIdAttr}"></i>
                                         <span id="${trackingIdAttr}">${statusText}</span>
                                     </span>
                                 </div>
+                               
                             </div>
+                            
                         </div>
                     `);
                 }
+
             }
         },
+
         {
             name: "Email",
-            hidden: true 
+            hidden: true // <-- THIS COMPLETELY HIDES THE COLUMN FROM THE UI [1]
         },
         {
             name: "arrived",
-            hidden: true 
+            hidden: true // <-- THIS COMPLETELY HIDES THE COLUMN FROM THE UI [1]
         },
-        {
-            name: "company",
-            hidden: true 
-        },
-        {
-            name: "event",
-            hidden: true 
-        },
-
     ],
-
     data: [],
     //data: [["", "", "No matching records found.", "", "", "", ""]] ,
     sort: true,
     pagination: {
-        limit: 20,
+        limit: 5,
         summary: true,
         buttonsCount: 3
     },
     fixedHeader: true,
     // 🌟 ADD THIS BLOCK RIGHT HERE INSIDE THE CONFIGURATION:
     height: '480px', // Forces the internal JS container logic to hard-lock scroll bounds
-        // ========================================================
-    // 🖨️ THE HARD INSULATED PRINT PREVIEW COMPONENT STYLING
-    // Adding !important overrides any inherited variables from your main styles!
-    // ========================================================
     style: {
-        container: {
-            'font-family': 'Arial, Helvetica, sans-serif !important',
-            'background-color': '#FFFFFF !important',
-            'color': '#000000 !important',
-            'box-shadow': 'none !important'
-        },
-        input: {
-            'font-family': 'Arial, sans-serif !important',
-            'background-color': '#FFFFFF !important',
-            'color': '#000000 !important',
-            'border': '1px solid #000000 !important',
-            'border-radius': '0px !important',
-            'padding': '8px 12px !important'
-        },
         table: {
-            'background-color': '#FFFFFF !important',
-            'border': '1px solid #000000 !important'
+            'display': 'block',
+            'width': '100%'
         },
-        th: {
-            'background-color': '#F2F2F2 !important', // Forces the clean light-grey column header block
-            'color': '#000000 !important',
-            'font-family': 'Arial, sans-serif !important',
-            'border-bottom': '2px solid #000000 !important',
-            'box-shadow': 'none !important'
+        tbody: {
+            'display': 'flex',
+            'flex-direction': 'column',
+            'gap': '12px',
+            'width': '100%'
+        },
+        tr: {
+            'display': 'block',
+            'width': '100%',
+            'height': 'auto' // Wipes out equal height spreadsheet splitting
         },
         td: {
-            'background-color': '#FFFFFF !important',
-            'color': '#000000 !important',
-            'font-family': 'Arial, sans-serif !important',
-            'border-bottom': '1px solid #CCCCCC !important'
-        },
-        footer: {
-            'background-color': '#FFFFFF !important',
-            'border-top': '1px solid #000000 !important',
-            'color': '#000000 !important'
+            'display': 'block',
+            'width': '100%',
+            'height': 'auto',
+            'padding': '0px'
         }
     },
-
     // ========================================================
     // 🗣️ THE LANGUAGE OVERRIDE FIX:
     // This forces Grid.js to replace its default translations.
@@ -282,7 +256,7 @@ const barcodeScanner = {
     submitTimeout: null, // Timer to handle the missing hardware Enter keyinit() {
 
     init: () => { 
-        
+
         console.log('===firing barcode scanner===')
         
         window.addEventListener("keydown", (e) => {
@@ -302,18 +276,6 @@ const barcodeScanner = {
             if (e.key.length > 1 && e.key !== 'Enter') {
                 return;
             }
-
-            if (scanTimeoutTracker) clearTimeout(scanTimeoutTracker);
-
-            scanTimeoutTracker = setTimeout(() => {
-                // 💡 THE FIX: If the safety buffer expires, make sure it only processes 
-                // a scan if the buffer is actually long enough to be a genuine QR code!
-                if (scannedBuffer.length > 3) {
-                    console.log("Processing stream from timeout safety buffer:", scannedBuffer);
-                    barcodeScanner.onQRCodeScannedSuccess(scannedBuffer);
-                }
-                scannedBuffer = ""; // Flush memory
-            }, 50);
 
             // FIX B: Explicitly target the object name 'barcodeScanner' to safely access the buffers
             const currentTime = Date.now();
@@ -347,7 +309,7 @@ const barcodeScanner = {
                 }
             }, 250); // Safe hardware rest interval
         });
-        
+
     }, // END INIT
 
     //======== TRIGGER SCAN=============//
@@ -381,15 +343,14 @@ const barcodeScanner = {
             console.log("Server verification status:", data.status);
             
             if(data.status){
-                let mydata = {name: data.xname, email: data.xemail, displayname: data.displayname, company: data.xcompany, event: data.xevent}
+                let mydata = {name: data.xname, email: data.xemail, displayname: data.displayname }
                 
-                //barcodeScanner.updategrid(mydata) 
-                await barcodeScanner.printSeminarBadge( mydata )
-            
-            }//eif
+                barcodeScanner.updategrid(mydata) 
+                
+            }
         } catch (error) {
             console.error("Failed to commit scan securely:", error);
-            jhuang.speak("Database network error! Please check your connection and try again.");
+            
             // =======================================================================
         } finally {
             // Turn off the lock when everything is completely finished
@@ -399,10 +360,10 @@ const barcodeScanner = {
     },//end sendscan
 
     //=========UPGRADE GRID ============
-    updateGrid: async (data )=> {
+    updategrid: async (data )=> {
 
         console.log('===updategrid() Grid received', data); // Check the transport
-        const targetEmail = data.email; // Example scanned payload
+        const targetEmail = data.xemail; // Example scanned payload
 
         jhuang.speak( `Welcome ${data.displayname }!`)
 
@@ -442,171 +403,8 @@ const barcodeScanner = {
 
         console.log("=== upgradegrid() Database quiet. Launching high-speed print job safely.");
         
-    },
-
-    //helper
-    getFontSizeForLength : (text, maxSize, minSize, threshold = 15) => {
-        if (text.length <= threshold) return maxSize;
-        // shrink 1px per character over the threshold, but never go below minSize
-        const shrunk = maxSize - (text.length - threshold) * 1.5;
-        return Math.max(shrunk, minSize);
-    },
-
-    //===========PRINTER FUNCS ===============
-    printSeminarBadge: async ( prndata ) => {
-        if (!window.niimbotClient) {
-            alert("Printer connection not active! Please click your main Connect button first.");
-            return;
-        }
-
-        try {
-            console.log("🚀 PRINTING PORTRAIT BADGE (HARD BUFFER WORKAROUND)...");
-            const client = window.niimbotClient;
-            client.setPacketInterval(5);
-
-            // 🎛️ ZONE #0 — PHYSICAL HARDWARE DIMENSIONS
-            const PW = 560; // Max edge-to-edge side printable width
-            const PH = 640; // Max length matching your 80mm paper roll run
-
-            const canvas = document.createElement('canvas');
-            canvas.width = PH;   // length axis (pre-rotation)
-            canvas.height = PW;  // width axis (pre-rotation)
-            const ctx = canvas.getContext('2d');
-
-            ctx.fillStyle = '#FFFFFF';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.translate(0, canvas.height);
-            ctx.rotate(-90 * Math.PI / 180);
-
-            // ========================================================
-            // 🖼️ ASSET LOADING: PROMISE PIPELINE FOR THE LOGO IMAGE
-            // ========================================================
-            const logoImg = new Image();
-            
-            // 💡 UPDATED: Locked directly onto your new regional project folder asset path!
-            //logoImg.src = "assets/img/vertiv.jpg"; 
-            logoImg.src = "assets/img/vertivlogo.png"; 
-
-            await new Promise((resolve, reject) => {
-                logoImg.onload = resolve;
-                logoImg.onerror = () => {
-                    console.warn("⚠️ assets/img/vertiv.jpg not found or could not load. Falling back to text.");
-                    resolve(); 
-                };
-            });
-
-            // ========================================================
-            // 🎨 ZONE #1 — HEADER BAR (ORIGINAL BLACK CONFIGURATION)
-            // ========================================================
-            const barH = 145; // Proportional header banner height to fit your logo perfectly
-            
-            ctx.fillStyle = '#000000'; // Back to your bold black background block!
-            ctx.fillRect(0, 0, PW, barH);
-
-            // 💡 NEW LOGO SPECIFICATIONS: Set exactly to your native 190x64 asset dimensions!
-            const imgW = 280; //190; 
-            const imgH = 95; // 64;  
-            const assetY = (barH - imgH) / 2; // Centers the logo vertically inside the 145px bar
-
-            // A. DRAW LOGO IMAGE USING AN ISOLATED WHITE BLOCK CONTAINER BUFFER
-           if (logoImg.complete && logoImg.naturalWidth > 0) {
-                //ctx.fillStyle = '#FFFFFF';
-                //ctx.fillRect(24, assetY - 6, imgW + 12, imgH + 12);
-
-                // 🧹 Clean the logo to pure black/white first (removes anti-aliased gray edges
-                // that were causing random parts of the logo to vanish on thermal print)
-                const offCanvas = document.createElement('canvas');
-                offCanvas.width = imgW;
-                offCanvas.height = imgH;
-                const offCtx = offCanvas.getContext('2d');
-                offCtx.imageSmoothingEnabled = false;
-                offCtx.drawImage(logoImg, 0, 0, imgW, imgH);
-
-                const imgData = offCtx.getImageData(0, 0, imgW, imgH);
-                const data = imgData.data;
-                for (let i = 0; i < data.length; i += 4) {
-                    const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
-                    const bw = brightness > 128 ? 255 : 0; // hard threshold — no gray allowed
-                    data[i] = data[i + 1] = data[i + 2] = bw;
-                    // alpha (data[i+3]) left untouched
-                }
-                offCtx.putImageData(imgData, 0, 0);
-
-                ctx.imageSmoothingEnabled = false; // no smoothing when drawing the cleaned version either
-                ctx.drawImage(offCanvas, 20, assetY, imgW, imgH); // 30 is left-side margin draw the CLEANED version, not logoImg directly
-
-            } else {
-                ctx.fillStyle = '#FFFFFF';
-                ctx.textAlign = 'left';
-                ctx.font = 'bold 26px Arial';
-                ctx.fillText("VERTIV", 20, barH / 2 + 8);
-            }
-            
-            // B. RENDER RIGHT-HAND TEXT (AsiaPRIME)
-            ctx.fillStyle = '#FFFFFF'; 
-            ctx.textAlign = 'right';
-            ctx.font = 'bold 25px Arial'; 
-            
-            // Keeps text optically balanced to the horizontal center line of your new logo dimensions
-            ctx.fillText(prndata.event.toUpperCase(), PW - 30, assetY + (imgH / 2) + 10);
-
-
-            // ========================================================
-            // 🎨 ZONE #2 — ATTENDEE TEXT NAME RENDERING
-            // ========================================================
-            const nameY = PH * 0.55; 
-            ctx.fillStyle = '#000000';
-            ctx.textAlign = 'center';
-
-            const nameText = prndata.name.toUpperCase();
-            const nameFontSize = barcodeScanner.getFontSizeForLength(nameText, 46, 26); // 👈 shrink if over 15 chars
-            ctx.font = `bold ${nameFontSize}px Arial`;
-            ctx.fillText(nameText, PW / 2, nameY);
-
-            // ========================================================
-            // 🎨 ZONE #3 — COMPANY SUBTITLE
-            // ========================================================
-            const subtitleY = nameY + 45;
-            const companyText = prndata.company.toUpperCase();
-            const companyFontSize = barcodeScanner.getFontSizeForLength(companyText, 22, 14);
-            ctx.font = `bold ${companyFontSize}px Arial`;
-            ctx.fillStyle = '#333333';
-            ctx.fillText(companyText, PW / 2, subtitleY);
-            // ========================================================
-            // 📦 COMPILATION AND STREAM PACKET DELIVERY
-            // ========================================================
-            const encodedImage = niimbluelib.ImageEncoder.encodeCanvas(canvas);
-
-            const task = client.abstraction.newPrintTask("B1", {
-                totalPages: 1,
-                density: 3,
-                labelType: 1,
-                width: PH,
-                height: PW,
-                printDirection: "top"
-            });
-
-            await task.printInit();
-            await task.printPage(encodedImage, 1);
-            await task.waitForFinished(); 
-
-            console.log("🎉 Automated badge print loop executed successfully!");
-
-        } catch (error) {
-            console.error("Transmission error during print phase: ", error);
-        } finally {
-            
-            // update grid
-            await barcodeScanner.updateGrid( prndata);
-
-            // announce complete
-            jhuang.speak('Printing complete!');
-
-            //reset input field and focus for next scan
-            document.getElementById('scanner-input').value = null;
-            document.getElementById('scanner-input').focus();
-            
-        }
+        //=========print to printer
+        await barcodeScanner.printSeminarBadge(data.displayname, data.name)
     },
 
     //================MAIN FUNC CONNECT PRINTER ==========//
@@ -700,7 +498,7 @@ const barcodeScanner = {
         window.niimbotClient.on('disconnect', () => {
             
             console.log("Status: Physical Cable Unplugged.");
-            jhuang.speak('Warning! Kiosk printer cable was unplugged!..... Warning! Kiosk printer cable was unplugged!');
+            jhuang.speak('Warning! Kiosk printer cable was unplugged!');
             
             // Clear the visual warning styles right before connecting
             const conbtn = document.getElementById('connect-printer-btn');
@@ -709,7 +507,7 @@ const barcodeScanner = {
                 // 2. Visual cue: Flash the button or highlight it so the user knows exactly where to tap
             conbtn.style.border = "3px solid red";
             conbtn.style.animation = "pulse 1.5s infinite";
-            conbtn.innerText = "🖨️ Connect Printer"; 
+            conbtn.innerText = "Connect Printer"; 
             
             // 3. Optional: Set up a one-time window listener that forwards the action to the button
             const forwardClick = async (e) => {
@@ -759,6 +557,150 @@ const barcodeScanner = {
             heartbeatInterval = null;
         }
 
+    },
+
+    //===========PRINTER FUNCS ===============
+    printSeminarBadge: async (firstName, fullName) => {
+        if (!window.niimbotClient) {
+            alert("Printer connection not active! Please click your main Connect button first.");
+            return;
+        }
+
+        try {
+            console.log("🚀 PRINTING PORTRAIT BADGE (HARD BUFFER WORKAROUND)...");
+            const client = window.niimbotClient;
+            client.setPacketInterval(5);
+
+            // 🎛️ ZONE #0 — PHYSICAL HARDWARE DIMENSIONS
+            const PW = 560; // Max edge-to-edge side printable width
+            const PH = 640; // Max length matching your 80mm paper roll run
+
+            const canvas = document.createElement('canvas');
+            canvas.width = PH;   // length axis (pre-rotation)
+            canvas.height = PW;  // width axis (pre-rotation)
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.translate(0, canvas.height);
+            ctx.rotate(-90 * Math.PI / 180);
+
+            // ========================================================
+            // 🖼️ ASSET LOADING: PROMISE PIPELINE FOR THE LOGO IMAGE
+            // ========================================================
+            const logoImg = new Image();
+            
+            // 💡 UPDATED: Locked directly onto your new regional project folder asset path!
+            //logoImg.src = "assets/img/vertiv.jpg"; 
+            logoImg.src = "assets/img/vertivlogo.png"; 
+
+            await new Promise((resolve, reject) => {
+                logoImg.onload = resolve;
+                logoImg.onerror = () => {
+                    console.warn("⚠️ assets/img/vertiv.jpg not found or could not load. Falling back to text.");
+                    resolve(); 
+                };
+            });
+
+            // ========================================================
+            // 🎨 ZONE #1 — HEADER BAR (ORIGINAL BLACK CONFIGURATION)
+            // ========================================================
+            const barH = 145; // Proportional header banner height to fit your logo perfectly
+            
+            ctx.fillStyle = '#000000'; // Back to your bold black background block!
+            ctx.fillRect(0, 0, PW, barH);
+
+            // 💡 NEW LOGO SPECIFICATIONS: Set exactly to your native 190x64 asset dimensions!
+            const imgW = 280; //190; 
+            const imgH = 95; // 64;  
+            const assetY = (barH - imgH) / 2; // Centers the logo vertically inside the 145px bar
+
+            // A. DRAW LOGO IMAGE USING AN ISOLATED WHITE BLOCK CONTAINER BUFFER
+           if (logoImg.complete && logoImg.naturalWidth > 0) {
+                //ctx.fillStyle = '#FFFFFF';
+                //ctx.fillRect(24, assetY - 6, imgW + 12, imgH + 12);
+
+                // 🧹 Clean the logo to pure black/white first (removes anti-aliased gray edges
+                // that were causing random parts of the logo to vanish on thermal print)
+                const offCanvas = document.createElement('canvas');
+                offCanvas.width = imgW;
+                offCanvas.height = imgH;
+                const offCtx = offCanvas.getContext('2d');
+                offCtx.imageSmoothingEnabled = false;
+                offCtx.drawImage(logoImg, 0, 0, imgW, imgH);
+
+                const imgData = offCtx.getImageData(0, 0, imgW, imgH);
+                const data = imgData.data;
+                for (let i = 0; i < data.length; i += 4) {
+                    const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                    const bw = brightness > 128 ? 255 : 0; // hard threshold — no gray allowed
+                    data[i] = data[i + 1] = data[i + 2] = bw;
+                    // alpha (data[i+3]) left untouched
+                }
+                offCtx.putImageData(imgData, 0, 0);
+
+                ctx.imageSmoothingEnabled = false; // no smoothing when drawing the cleaned version either
+                ctx.drawImage(offCanvas, 30, assetY, imgW, imgH); // draw the CLEANED version, not logoImg directly
+
+            } else {
+                ctx.fillStyle = '#FFFFFF';
+                ctx.textAlign = 'left';
+                ctx.font = 'bold 26px Arial';
+                ctx.fillText("VERTIV", 30, barH / 2 + 8);
+            }
+            
+            // B. RENDER RIGHT-HAND TEXT (AsiaPRIME)
+            ctx.fillStyle = '#FFFFFF'; 
+            ctx.textAlign = 'right';
+            ctx.font = 'bold 28px Arial'; 
+            
+            // Keeps text optically balanced to the horizontal center line of your new logo dimensions
+            ctx.fillText("AsiaPRIME", PW - 30, assetY + (imgH / 2) + 10);
+
+            // ========================================================
+            // 🎨 ZONE #2 — ATTENDEE TEXT NAME RENDERING
+            // ========================================================
+            const nameY = PH * 0.55; 
+            ctx.fillStyle = '#000000';
+            ctx.textAlign = 'center';
+            ctx.font = 'bold 46px Arial'; 
+            ctx.fillText(String(firstName).toUpperCase(), PW / 2, nameY);
+
+            // ========================================================
+            // 🎨 ZONE #3 — COMPANY SUBTITLE
+            // ========================================================
+            const subtitleY = nameY + 45;
+            ctx.font = 'bold 22px Arial';
+            ctx.fillStyle = '#333333';
+            ctx.fillText(fullName.toUpperCase(), PW / 2, subtitleY);
+
+            // ========================================================
+            // 📦 COMPILATION AND STREAM PACKET DELIVERY
+            // ========================================================
+            const encodedImage = niimbluelib.ImageEncoder.encodeCanvas(canvas);
+
+            const task = client.abstraction.newPrintTask("B1", {
+                totalPages: 1,
+                density: 3,
+                labelType: 1,
+                width: PH,
+                height: PW,
+                printDirection: "top"
+            });
+
+            await task.printInit();
+            await task.printPage(encodedImage, 1);
+            await task.waitForFinished(); 
+
+            console.log("🎉 Automated badge print loop executed successfully!");
+
+        } catch (error) {
+            console.error("Transmission error during print phase: ", error);
+        } finally {
+            jhuang.speak('Printing complete!');
+            document.getElementById('scanner-input').value = null;
+            document.getElementById('scanner-input').focus();
+        }
     },
 
     previewSeminarBadge: async (firstName, fullName) => {
@@ -833,50 +775,16 @@ const barcodeScanner = {
             console.error("Preview error: ", error);
         }
     },
-     // A secure, public JSON dataset containing every recognized nation on earth
-        
-    populateKioskCountries: async () => {
-        const dropdown = document.getElementById("country-select");
-        dropdown.innerHTML = ""; // Clear any existing options
-        try {
-            // Calls YOUR backend, not restcountries.com directly — no key exposed to the browser
-            const response = await fetch(`${myIp}/qr/countries`);
-            const sortedCountries = (await response.json()).sort();
-
-            sortedCountries.forEach(countryName => {
-                const option = document.createElement("option");
-                option.value = countryName;
-                option.innerText = countryName;
-                dropdown.appendChild(option);
-            });
-
-            console.log(`🎉 Successfully loaded ${sortedCountries.length} countries into the dropdown!`);
-
-        } catch (error) {
-            console.error("Failed to fetch international country data array:", error);
-
-            const regionalFallback = ["Philippines", "Singapore", "Malaysia", "Thailand", "Indonesia", "Vietnam", "Cambodia"];
-            regionalFallback.sort().forEach(countryName => {
-                const option = document.createElement("option");
-                option.value = countryName;
-                option.innerText = countryName;
-                dropdown.appendChild(option);
-            });
-        }
-    },
-
 
 }; //end obj bardcoedeScanner
 
 //=============END BARCODE SCANNER =========//
 
 //==================IMPORTANT DOCUMENT CONTENT LOADED =================//
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', function() {
 
     if (window.niimbluelib) return;
     
-    window.connectedToPrinter = false; // Reset the connection state on page load
-
     // Breaking the path apart into small pieces to prevent text cutting
     const domain = "https:" + "//" + "cdn" + ".jsdelivr.net";
     const path = "/npm/@mmote/niimbluelib" + "@0.0.1-alpha.41" + "/dist/umd/niimbluelib.min.js";
@@ -894,14 +802,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     displayEvents();
 
     //connect to socket.io util.js
-    //not need -> jhuang.connectsocket()
+    jhuang.connectsocket()
 
-    await barcodeScanner.init();
+    barcodeScanner.init();
 
-    //barcodeScanner.connectToNiimbotB3S();
-
-    //=============ANNOUNCE ================//
-    jhuang.speak('vertiv ONLINE!' )
+    jhuang.speak('vertiv system ready!' )
          
     // 3. SECURE FORM SUBMIT INTERCEPT HANDLER
     document.getElementById('registrationForm').addEventListener('submit', function(e) {
@@ -929,25 +834,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     //for cp
-    // // Strict real-time character mask for the phone input field
-    // document.getElementById('userPhone').addEventListener('input', function (e) {
-    //     let value = this.value;
+    // Strict real-time character mask for the phone input field
+    document.getElementById('userPhone').addEventListener('input', function (e) {
+        let value = this.value;
 
-    //     // 1. Check if the very first character is a plus sign
-    //     const hasPlus = value.startsWith('+');
+        // 1. Check if the very first character is a plus sign
+        const hasPlus = value.startsWith('+');
 
-    //     // 2. Strip absolutely everything that is not a raw number digit
-    //     let cleanNumbers = value.replace(/[^0-9]/g, '');
+        // 2. Strip absolutely everything that is not a raw number digit
+        let cleanNumbers = value.replace(/[^0-9]/g, '');
 
-    //     // 3. Reconstruct the string: re-apply the plus only if it was originally there
-    //     this.value = (hasPlus ? '+' : '') + cleanNumbers;
-    // });
+        // 3. Reconstruct the string: re-apply the plus only if it was originally there
+        this.value = (hasPlus ? '+' : '') + cleanNumbers;
+    });
 
-    // //for email
-    // // Automatically removes spaces from the email input in real time
-    // document.getElementById('userEmail').addEventListener('input', function () {
-    //     this.value = this.value.replace(/\s/g, '');
-    // });
+    //for email
+    // Automatically removes spaces from the email input in real time
+    document.getElementById('userEmail').addEventListener('input', function () {
+        this.value = this.value.replace(/\s/g, '');
+    });
 
     //===== for dashboard modal loaded
     document.addEventListener('click', async (e) => {
@@ -969,86 +874,86 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return 
             break;
 
-            // case 'test-printer-btn':
-            //     e.preventDefault();
+            case 'test-printer-btn':
+                e.preventDefault();
                 
-            //     // 1. UPDATED GUARD: Verify the library instance exists 
-            //     if (!window.niimbotClient) {
-            //         alert("USB Cable disconnected! Please click Connect button first.");
-            //         break;
-            //     }
+                // 1. UPDATED GUARD: Verify the library instance exists 
+                if (!window.niimbotClient) {
+                    alert("USB Cable disconnected! Please click Connect button first.");
+                    break;
+                }
 
-            //     try {
-            //         console.log("🚀 STARTING SYNCHRONIZED B3S DATA PIPELINE...");
-            //         const client = window.niimbotClient;
+                try {
+                    console.log("🚀 STARTING SYNCHRONIZED B3S DATA PIPELINE...");
+                    const client = window.niimbotClient;
 
-            //         client.setPacketInterval(5); // Slightly higher delay buffer to support larger B3S labels
+                    client.setPacketInterval(5); // Slightly higher delay buffer to support larger B3S labels
 
-            //         // 2. Generate test label canvas
-            //         const canvas = document.createElement('canvas');
-            //         // canvas.width = 240;
-            //         // canvas.height = 240;
+                    // 2. Generate test label canvas
+                    const canvas = document.createElement('canvas');
+                    // canvas.width = 240;
+                    // canvas.height = 240;
                     
-            //         canvas.width = 560;  //70mm
-            //         canvas.height = 240; //100mm
+                    canvas.width = 560;  //70mm
+                    canvas.height = 240; //100mm
                     
-            //         const ctx = canvas.getContext('2d');
+                    const ctx = canvas.getContext('2d');
 
-            //         ctx.fillStyle = '#FFFFFF'; 
-            //         ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = '#FFFFFF'; 
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            //         jhuang.toggleLoading('dgrp-grid',true,"PRINTING pls wait!!!")
+                    jhuang.toggleLoading('dgrp-grid',true,"PRINTING pls wait!!!")
 
-            //         const firstName = "KATRINA"    
-            //         const fullName = "Katrina Uy" // Added variable to test subtitle line
+                    const firstName = "KATRINA"    
+                    const fullName = "Katrina Uy" // Added variable to test subtitle line
 
-            //         // Dynamic Text Elements Layout Rendering
-            //         ctx.fillStyle = '#000000';
-            //         ctx.font = 'bold 52px Arial';
-            //         ctx.textAlign = 'center';
-            //         ctx.fillText(String(firstName).toUpperCase(), 280, 60); // Now 280 is perfectly centered!
+                    // Dynamic Text Elements Layout Rendering
+                    ctx.fillStyle = '#000000';
+                    ctx.font = 'bold 52px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(String(firstName).toUpperCase(), 280, 60); // Now 280 is perfectly centered!
 
-            //         // 2. THE SEPARATOR ACCENT BAR
-            //         ctx.fillRect(60,95,440,5); // Placed elegantly beneath her name tracking center
+                    // 2. THE SEPARATOR ACCENT BAR
+                    ctx.fillRect(60,95,440,5); // Placed elegantly beneath her name tracking center
 
-            //         // 3. FULL NAME SUBTITLE (Now visible inside the expanded 360 canvas space)
-            //         ctx.font = 'bold 28px Arial';
-            //         ctx.fillText(fullName, 280, 145); // Centered nicely in the middle deck
+                    // 3. FULL NAME SUBTITLE (Now visible inside the expanded 360 canvas space)
+                    ctx.font = 'bold 28px Arial';
+                    ctx.fillText(fullName, 280, 145); // Centered nicely in the middle deck
 
-            //         // 4. SEMINAR ATTENDEE BADGE TAG
-            //         ctx.font = 'italic 20px Arial';
-            //         ctx.fillStyle = '#666666';
-            //         ctx.fillText("SEMINAR ATTENDEE", 280, 205); // Bottom tracking marker row
+                    // 4. SEMINAR ATTENDEE BADGE TAG
+                    ctx.font = 'italic 20px Arial';
+                    ctx.fillStyle = '#666666';
+                    ctx.fillText("SEMINAR ATTENDEE", 280, 205); // Bottom tracking marker row
 
-            //         // 3. Encode canvas pixels via image parser tool
-            //         console.log("Compiling binary matrix vectors...");
-            //         const encodedImage = niimbluelib.ImageEncoder.encodeCanvas(canvas);
+                    // 3. Encode canvas pixels via image parser tool
+                    console.log("Compiling binary matrix vectors...");
+                    const encodedImage = niimbluelib.ImageEncoder.encodeCanvas(canvas);
 
-            //         // 4. FIX HERE: Pass "B1" as the task class identifier (B3S uses the B1 class layout!)
-            //         const task = client.abstraction.newPrintTask("B1", {
-            //             totalPages: 1,
-            //             density: 3,
-            //             labelType: 1
-            //         });
+                    // 4. FIX HERE: Pass "B1" as the task class identifier (B3S uses the B1 class layout!)
+                    const task = client.abstraction.newPrintTask("B1", {
+                        totalPages: 1,
+                        density: 3,
+                        labelType: 1
+                    });
                     
-            //         console.log("Sending Print Initializer Handshake...");
-            //         await task.printInit();
+                    console.log("Sending Print Initializer Handshake...");
+                    await task.printInit();
                     
-            //         console.log("Streaming encoded page data packets...");
-            //         await task.printPage(encodedImage, 1);
+                    console.log("Streaming encoded page data packets...");
+                    await task.printPage(encodedImage, 1);
                     
-            //         console.log("Closing session and executing motor rollers...");
-            //         await task.waitForFinished(); 
+                    console.log("Closing session and executing motor rollers...");
+                    await task.waitForFinished(); 
                
 
-            //     } catch (error) {
-            //         console.error("Transmission error during print phase: ", error);
-            //     } finally {
-            //         console.log("🎉 testprint():finally() == Print loop executed successfully! Motor should feed.");
-            //         jhuang.toggleLoading('dgrp-grid',false,null)
-            //     }
+                } catch (error) {
+                    console.error("Transmission error during print phase: ", error);
+                } finally {
+                    console.log("🎉 testprint():finally() == Print loop executed successfully! Motor should feed.");
+                    jhuang.toggleLoading('dgrp-grid',false,null)
+                }
 
-            // break;
+            break;
         
         }//eofsw
     })//end doc click
@@ -1077,19 +982,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ===== Listener to trigger fetch() when Dashboard Modal is fully shown, this will also fetch 
     // ===== all registered attendees 
     const dashModalElement = document.getElementById('dashboardModal');
-    dashModalElement.addEventListener('shown.bs.modal', async function () {
+
+    dashModalElement.addEventListener('shown.bs.modal', function () {
         console.log("Dashboard modal is fully visible. Triggering data fetch...");
         
-        //=== always focus on input field scan=======
-        document.getElementById('scanner-input').value = null;
-        document.getElementById('scanner-input').focus();
-
-        //=== connect to printer
-        if(!window.connectedToPrinter){
-            await barcodeScanner.connectToNiimbotB3S();
-            window.connectedToPrinter = true;
-        }
-
         // Target your inner data container
         const gridContainer = document.getElementById('dgrp-grid');
         ///gridContainer.innerHTML = '<span class="text-light opacity-50 small"><i class="bi bi-arrow-clockwise hris-spin me-2"></i>Loading data...</span>';
@@ -1115,9 +1011,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const formattedRows = serverRows.map(row => [
                     row.full_name.toUpperCase(), 
                     row.email,
-                    row.arrived,
-                    row.company,
-                    row.event
+                    row.arrived
                 ]);
                 
                 // 4. Update the data array inside a single frame swap
@@ -1135,14 +1029,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 gridContainer.innerHTML = '<span class="text-danger small"><i class="bi bi-exclamation-triangle me-2"></i>Failed to load records.</span>';
             
             });
-    });
-
-    //====registration modal show
-    const regModalElement = document.getElementById('registrationModal');
-    regModalElement.addEventListener('shown.bs.modal', function () {
-        console.log("Registration modal is fully visible. Focusing on the first input field...");
-        //document.getElementById('userName').focus();
-        barcodeScanner.populateKioskCountries();
     });
 
 

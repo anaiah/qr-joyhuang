@@ -1,4 +1,4 @@
-//const myIp = "http://192.168.1.23:10000" 
+//const myIp = "http://192.168.1.50:10000" 
 const myIp= "https://asn-jtgrp-api.onrender.com"
 
 //speech synthesis
@@ -274,7 +274,14 @@ const jhuang = {
             jhuang.socket.on('disconnect', () => {
                 console.log('Disconnected from vertiv Socket.IO server');
             });
-    }
+    },
+
+    scrollsTo:(cTarget)=>{
+        //asn.collapz()
+        const elem = document.getElementById(cTarget)
+        elem.scrollIntoView(true,{ behavior: 'smooth', block:'start', inline:'nearest' });
+
+	},
 
     //show modal box
 
