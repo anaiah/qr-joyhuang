@@ -880,7 +880,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     script.onerror = () => console.error("❌ Failed to download library from CDN.");
     document.head.appendChild(script);
     
-    console.log('======DOMContenLoaded====')
+    console.log('====== santized DOMContenLoaded====')
     displayEvents();
 
     //connect to socket.io util.js
