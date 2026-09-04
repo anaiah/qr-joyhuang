@@ -377,6 +377,7 @@ const barcodeScanner = {
                 
                 //barcodeScanner.updategrid(mydata) 
                 await barcodeScanner.printSeminarBadge( mydata )
+                //await barcodeScanner.previewSeminarBadge( mydata )
             
             }//eif
         } catch (error) {
@@ -496,9 +497,9 @@ const barcodeScanner = {
             ctx.fillRect(0, 0, PW, barH);
 
             // 💡 NEW LOGO SPECIFICATIONS: Set exactly to your native 190x64 asset dimensions!
-            const imgW = 280; //190; 
-            const imgH = 95; // 64;  
-            const assetY = (barH - imgH) / 2; // Centers the logo vertically inside the 145px bar
+            const imgW = 230;//280; //190;
+            const imgH = 75; //95; //64;
+            const assetY = (barH - imgH) / 2;
 
             // A. DRAW LOGO IMAGE USING AN ISOLATED WHITE BLOCK CONTAINER BUFFER
            if (logoImg.complete && logoImg.naturalWidth > 0) {
@@ -537,7 +538,7 @@ const barcodeScanner = {
             // B. RENDER RIGHT-HAND TEXT (AsiaPRIME)
             ctx.fillStyle = '#FFFFFF'; 
             ctx.textAlign = 'right';
-            ctx.font = 'bold 25px Arial'; 
+            ctx.font = 'bold 20px Arial'; 
             
             // Keeps text optically balanced to the horizontal center line of your new logo dimensions
             ctx.fillText(prndata.event.toUpperCase(), PW - 30, assetY + (imgH / 2) + 10);
@@ -723,7 +724,7 @@ const barcodeScanner = {
 
     },
 
-    previewSeminarBadge: async (firstName, fullName) => {
+    previewSeminarBadge: async (prndata) => {
         try {
             const PW = 560;
             const PH = 640;
@@ -755,36 +756,70 @@ const barcodeScanner = {
             ctx.fillStyle = '#000000';
             ctx.fillRect(0, 0, PW, barH);
 
-            const imgW = 280; //190;
-            const imgH = 95; //64;
+            const imgW = 230;//280; //190;
+            const imgH = 75; //95; //64;
             const assetY = (barH - imgH) / 2;
 
-            if (logoImg.complete && logoImg.naturalWidth > 0) {
-                ctx.fillStyle = '#FFFFFF';
-                ctx.fillRect(24, assetY - 6, imgW + 12, imgH + 12);
-                ctx.drawImage(logoImg, 30, assetY, imgW, imgH);
+             // A. DRAW LOGO IMAGE USING AN ISOLATED WHITE BLOCK CONTAINER BUFFER
+           if (logoImg.complete && logoImg.naturalWidth > 0) {
+                //ctx.fillStyle = '#FFFFFF';
+                //ctx.fillRect(24, assetY - 6, imgW + 12, imgH + 12);
+
+                // 🧹 Clean the logo to pure black/white first (removes anti-aliased gray edges
+                // that were causing random parts of the logo to vanish on thermal print)
+                const offCanvas = document.createElement('canvas');
+                offCanvas.width = imgW;
+                offCanvas.height = imgH;
+                const offCtx = offCanvas.getContext('2d');
+                offCtx.imageSmoothingEnabled = false;
+                offCtx.drawImage(logoImg, 0, 0, imgW, imgH);
+
+                const imgData = offCtx.getImageData(0, 0, imgW, imgH);
+                const data = imgData.data;
+                for (let i = 0; i < data.length; i += 4) {
+                    const brightness = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                    const bw = brightness > 128 ? 255 : 0; // hard threshold — no gray allowed
+                    data[i] = data[i + 1] = data[i + 2] = bw;
+                    // alpha (data[i+3]) left untouched
+                }
+                offCtx.putImageData(imgData, 0, 0);
+
+                ctx.imageSmoothingEnabled = false; // no smoothing when drawing the cleaned version either
+                ctx.drawImage(offCanvas, 20, assetY, imgW, imgH); // 30 is left-side margin draw the CLEANED version, not logoImg directly
+
             } else {
                 ctx.fillStyle = '#FFFFFF';
                 ctx.textAlign = 'left';
                 ctx.font = 'bold 26px Arial';
-                ctx.fillText("VERTIV", 30, barH / 2 + 8);
+                ctx.fillText("VERTIV", 20, barH / 2 + 8);
             }
 
             ctx.fillStyle = '#FFFFFF';
             ctx.textAlign = 'right';
-            ctx.font = 'bold 28px Arial';
-            ctx.fillText("AsiaPRIME", PW - 30, assetY + (imgH / 2) + 10);
+            ctx.font = 'bold 20px Arial';
+            
+            // Keeps text optically balanced to the horizontal center line of your new logo dimensions
+            ctx.fillText(prndata.event.toUpperCase(), PW - 30, assetY + (imgH / 2) + 10);
 
-            const nameY = PH * 0.55;
+            const nameY = PH * 0.55; 
             ctx.fillStyle = '#000000';
             ctx.textAlign = 'center';
-            ctx.font = 'bold 46px Arial';
-            ctx.fillText(String(firstName).toUpperCase(), PW / 2, nameY);
 
+            const nameText = prndata.name.toUpperCase();
+            const nameFontSize = barcodeScanner.getFontSizeForLength(nameText, 46, 26); // 👈 shrink if over 15 chars
+            ctx.font = `bold ${nameFontSize}px Arial`;
+            ctx.fillText(nameText, PW / 2, nameY);
+
+            // ========================================================
+            // 🎨 ZONE #3 — COMPANY SUBTITLE
+            // ========================================================
             const subtitleY = nameY + 45;
-            ctx.font = 'bold 22px Arial';
+            const companyText = prndata.company.toUpperCase();
+            const companyFontSize = barcodeScanner.getFontSizeForLength(companyText, 22, 14);
+            ctx.font = `bold ${companyFontSize}px Arial`;
             ctx.fillStyle = '#333333';
-            ctx.fillText(fullName.toUpperCase(), PW / 2, subtitleY);
+            ctx.fillText(companyText, PW / 2, subtitleY);
+            
 
             // 🖼️ PREVIEW: open the exact canvas as an image, no printing involved
             const dataUrl = canvas.toDataURL('image/png');
