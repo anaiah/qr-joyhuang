@@ -352,11 +352,14 @@ const barcodeScanner = {
         // 3. CRUCIAL FIX: Encode the URL correctly so spaces like "Katrina Uy" don't break the fetch!
         // This converts spaces into "%20", preventing the 404 truncation drop
         const sanitizedUrl = encodeURI(localRoutePath); 
+
+         let cleanUrl = sanitizedUrl.replace(/\/$/, "");
+         
         console.log("Fixed Safe Local Network Path Assembled:", sanitizedUrl);
         
         try {
             // Send the scan payload up to your API server
-            const response = await fetch(sanitizedUrl, {
+            const response = await fetch(cleanUrl, {
                 method: "GET",
                 headers: { "Content-Type": "application/json" }
             });
