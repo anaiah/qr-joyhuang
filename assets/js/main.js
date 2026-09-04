@@ -550,7 +550,6 @@ const barcodeScanner = {
             // Keeps text optically balanced to the horizontal center line of your new logo dimensions
             ctx.fillText(prndata.event.toUpperCase(), PW - 30, assetY + (imgH / 2) + 10);
 
-
             // ========================================================
             // 🎨 ZONE #2 — ATTENDEE TEXT NAME RENDERING
             // ========================================================
