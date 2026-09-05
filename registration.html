@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Event Registration</title>
+
+<!-- Bootstrap 5.3.3 -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap Icons (used by the submit button's check-circle icon) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+<style>
+    body {
+        background-color: #0b0c10;
+        color: #ffffff;
+        min-height: 100vh;
+    }
+
+    .registration-card {
+        background-color: #1f2128;
+        border: 1px solid #343844;
+        border-radius: 0.5rem;
+    }
+
+    .btn-live-red {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        color: #ffffff;
+    }
+
+    .btn-live-red:hover {
+        background-color: #bb2d3b;
+        border-color: #b02a37;
+        color: #ffffff;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        background-color: #14161c;
+        color: #ffffff;
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+    }
+
+    .form-control,
+    .form-select {
+        background-color: #14161c;
+    }
+
+    .form-control::placeholder {
+        color: #6c7280;
+    }
+</style>
+</head>
+<body>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-9">
+
+            <div class="registration-card p-4 p-md-5">
+
+                <h5 class="fw-bold mb-4">Event Registration</h5>
+
+                <div class="p-3 mb-4 rounded" style="background-color: #0b0c10; border-left: 4px solid #dc3545;">
+                    <h6 id="modal-event-title" class="fw-bold mb-1 text-white">Event Title</h6>
+                    <small id="modal-event-meta" class="text-danger fw-bold text-uppercase"></small>
+                </div>
+
+                <!-- 💡 Form Submit Rule: Captures form submissions, stops page refresh, and runs your custom target handler function -->
+                <form id="registrationForm" onsubmit="event.preventDefault(); reg.register(); return false;">
+                    
+                    <div class="row">
+                        <div class="mb-3">
+                            <label for="form-event-id" class="form-label small fw-bold text-uppercase text-light">Event Name</label>
+                            <input type="text" class="form-control bg-dark text-white border-secondary" id="form-event-id" name="eventId" placeholder="e.g. Masterclass" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <!-- First Name Input Row -->
+                        <div class="col-md-6 mb-3">
+                            <label for="firstName" class="form-label small fw-bold text-uppercase text-light">First Name</label>
+                            <input type="text" class="form-control bg-dark text-white border-secondary" id="firstName" placeholder="John" required>
+                        </div>
+
+                        <!-- Last Name Input Row -->
+                        <div class="col-md-6 mb-3">
+                            <label for="lastName" class="form-label small fw-bold text-uppercase text-light">Last Name</label>
+                            <input type="text" class="form-control bg-dark text-white border-secondary" id="lastName" placeholder="Doe" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Email Input Row -->
+                        <div class="col-md-6 mb-3">
+                            <label for="userEmail" class="form-label small fw-bold text-uppercase text-light">Email Address</label>
+                            <input
+                                type="email"
+                                class="form-control bg-dark text-white border-secondary"
+                                id="userEmail"
+                                placeholder="johndoe@example.com"
+                                pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                                title="Please enter a valid email address (e.g., name@domain.com)."
+                                required
+                            >
+                        </div>
+
+                        <!-- Business Phone Input Row -->
+                        <div class="col-md-6 mb-3">
+                            <label for="userPhone" class="form-label small fw-bold text-uppercase text-light">Business Phone</label>
+                            <input
+                                type="text"
+                                class="form-control bg-dark text-white border-secondary"
+                                id="userPhone"
+                                placeholder="+639123456789 or 09123456789"
+                                pattern="^\+?[0-9]+$"
+                                title="Phone number must only contain digits and can optionally start with a '+' sign."
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Company Name Input Row -->
+                        <div class="col-md-6 mb-3">
+                            <label for="userCompany" class="form-label small fw-bold text-uppercase text-light">Company</label>
+                            <input type="text" class="form-control bg-dark text-white border-secondary" id="userCompany" placeholder="Acme Corp" required>
+                        </div>
+
+                        <!-- Event Name Input Row -->
+                        <div class="col-md-6 mb-3">
+                            <label for="eventNameInput" class="form-label small fw-bold text-uppercase text-light">Event Name</label>
+                            <input type="text" class="form-control bg-dark text-white border-secondary" id="eventNameInput" placeholder="Tech Summit 2026" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Country Select Box Component (Connected directly to your custom async JS loop population target) -->
+                        <div class="col-md-6 mb-3">
+                            <label for="country-select" class="form-label small fw-bold text-uppercase text-light">Country</label>
+                            <select id="country-select" class="form-select bg-dark text-white border-secondary" required>
+                                <option value="" selected disabled>Select your country...</option>
+                            </select>
+                        </div>
+
+                        <!-- Job Function Input Row -->
+                        <div class="col-md-6 mb-3">
+                            <label for="jobFunction" class="form-label small fw-bold text-uppercase text-light">Job Function</label>
+                            <input type="text" class="form-control bg-dark text-white border-secondary" id="jobFunction" placeholder="IT Manager / Coordinator" required>
+                        </div>
+                    </div>
+
+                    <!-- Industry Select Box Component (Connected directly to your offline JS memory loop population target) -->
+                    <div class="mb-4">
+                        <label for="industry-select" class="form-label small fw-bold text-uppercase text-light">Industry</label>
+                        <select id="industry-select" class="form-select bg-dark text-white border-secondary" required>
+                            <option value="" selected disabled>Select your industry...</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-live-red w-100 py-2 rounded-pill fw-bold">
+                        <i class="bi bi-check-circle-fill me-1"></i> Confirm Registration
+                    </button>
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap 5.3.3 JS bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // ⚠️ PLACEHOLDER STUB — replace this whole block with your real barcodeScanner script include.
+    // This exists only so the page doesn't throw a ReferenceError when opened on its own.
+    window.reg = window.reg || {
+        register: async () => {
+            // Collect all field values from the form
+            const payload = {
+                eventId:     document.getElementById('form-event-id').value,
+                firstName:   document.getElementById('firstName').value.trim(),
+                lastName:    document.getElementById('lastName').value.trim(),
+                email:       document.getElementById('userEmail').value.trim(),
+                phone:       document.getElementById('userPhone').value.trim(),
+                company:     document.getElementById('userCompany').value.trim(),
+                eventName:   document.getElementById('eventNameInput').value.trim(),
+                country:     document.getElementById('country-select').value,
+                jobFunction: document.getElementById('jobFunction').value.trim(),
+                industry:    document.getElementById('industry-select').value
+            };
+
+            try {
+                const myIp= "https://asn-jtgrp-api.onrender.com"
+
+                const response = await fetch(`${myIp}/qr/savereg`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || 'Registration failed');
+                }
+
+                console.log('✅ Registration saved:', result);
+                alert('Registration successful!');
+                document.getElementById('registrationForm').reset();
+
+            } catch (error) {
+                console.error('❌ Registration error:', error);
+                alert('Something went wrong while saving your registration. Please try again.');
+            }
+        },
+        populateKioskCountries: async () => {
+            const dropdown = document.getElementById("country-select");
+            dropdown.innerHTML = ""; // Clear any existing options
+            try {
+                // Calls YOUR backend, not restcountries.com directly — no key exposed to the browser
+                const response = await fetch(`${myIp}/qr/countries`);
+                const sortedCountries = (await response.json()).sort();
+
+                sortedCountries.forEach(countryName => {
+                    const option = document.createElement("option");
+                    option.value = countryName;
+                    option.innerText = countryName;
+                    dropdown.appendChild(option);
+                });
+
+                console.log(`🎉 Successfully loaded ${sortedCountries.length} countries into the dropdown!`);
+
+            } catch (error) {
+                console.error("Failed to fetch international country data array:", error);
+
+                const regionalFallback = ["Philippines", "Singapore", "Malaysia", "Thailand", "Indonesia", "Vietnam", "Cambodia"];
+                regionalFallback.sort().forEach(countryName => {
+                    const option = document.createElement("option");
+                    option.value = countryName;
+                    option.innerText = countryName;
+                    dropdown.appendChild(option);
+                });
+            }
+        },
+        populateKioskIndustries: () => {
+            const dropdown = document.getElementById("industry-select");
+            dropdown.innerHTML = ""; // Clear any existing options
+            const industries = [
+                "Technology",
+                "Healthcare",
+                "Finance",
+                "Education",
+                "Manufacturing",
+                "Retail",
+                "Hospitality",
+                "Transportation",
+                "Energy",
+                "Telecommunications"
+            ];
+            industries.sort().forEach(industryName => {
+                const option = document.createElement("option");
+                option.value = industryName;
+                option.innerText = industryName;
+                dropdown.appendChild(option);
+            });
+        }
+    };
+
+    // If your real populateKioskCountries()/industry loader exists, call it here on load, e.g.:
+    document.addEventListener('DOMContentLoaded', () => {
+        reg.populateKioskCountries();
+        reg.populateKioskIndustries();
+    });
+</script>
+
+</body>
+</html>

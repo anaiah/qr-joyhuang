@@ -916,6 +916,53 @@ const barcodeScanner = {
         }
     },
 
+    refreshGrid: async () => {
+        // Target your inner data container
+        const gridContainer = document.getElementById('dgrp-grid');
+        ///gridContainer.innerHTML = '<span class="text-light opacity-50 small"><i class="bi bi-arrow-clockwise hris-spin me-2"></i>Loading data...</span>';
+
+        jhuang.toggleLoading('dgrp-grid',true,"Loading pls wait!!!")
+
+        // Execute your backend API fetch request
+        fetch(`${myIp}/qr/getregistered`) // Change to your specific endpoint later
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();  
+        })
+        .then(serverRows => {
+
+            jhuang.toggleLoading('dgrp-grid',false,null)
+
+            console.log("Data fetched successfully from database:", serverRows );
+            
+            // For now, let's visualize the JSON payload cleanly inside your grid div
+            //gridContainer.innerHTML = `<pre class="text-success small mb-0">${JSON.stringify(data, null, 2)}</pre>`;
+            const formattedRows = serverRows.map(row => [
+                row.full_name.toUpperCase(), 
+                row.email,
+                row.arrived,
+                row.company,
+                row.event
+            ]);
+            
+            // 4. Update the data array inside a single frame swap
+            // If serverRows is empty [], Grid.js draws the dark empty message state instantly
+            //grid.updateConfig({ data: [...formattedRows] }).forceRender();
+            //document.getElementById("dgrp-grid").innerHTML = ""; // Clear any existing content
+            
+            grid.updateConfig({ data: formattedRows }).forceRender();
+            // TODO: Replace the line above later with your custom HTML table loops or grid rendering tool
+        })
+        .catch(error => {
+            jhuang.toggleLoading('dgrp-grid',false,null)
+            
+            console.error("Fetch operation failed:", error);
+            gridContainer.innerHTML = '<span class="text-danger small"><i class="bi bi-exclamation-triangle me-2"></i>Failed to load records.</span>';
+        
+        });
+    },
 
 }; //end obj bardcoedeScanner
 
@@ -1018,6 +1065,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 console.log('open excel upload...')
                 jhuang.modalShow('hrisloadModal'); 
                 return 
+            break;
+
+            case 'refresh-grid-btn':
+                e.preventDefault();
+                console.log("User requested a grid refresh...");
+                await barcodeScanner.refreshGrid();
+                return
             break;
 
             // case 'test-printer-btn':
