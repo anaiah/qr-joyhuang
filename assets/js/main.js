@@ -36,8 +36,8 @@ const grid = new gridjs.Grid({
                     event: registeredEvent
                 };
 
-                const reprintIndex = window.reprintDataStore.length;
-                window.reprintDataStore.push(reprintdata);
+                // const reprintIndex = window.reprintDataStore.length;
+                // window.reprintDataStore.push(reprintdata);
 
                 const registeredArrive = (sourceObj.arrived !== undefined) ? sourceObj.arrived : 
                                         (row?.cells[2]?.data !== undefined) ? row?.cells[2]?.data : 
@@ -84,7 +84,7 @@ const grid = new gridjs.Grid({
                                 
                                 <!-- 💡 THE PRINT FUNCTION BUTTON ADDITION:
                                      Maps your parameters straight to printSeminarBadge() inside the button gesture! -->
-                                <button onclick="barcodeScanner.printSeminarBadge(window.reprintDataStore[${reprintIndex}])"
+                                <button onclick="barcodeScanner.printSeminarBadge({ name: '${registeredName}', email: '${registeredEmail}', company: '${registeredCompany}', event: '${registeredEvent}' } )"
                                         class="btn btn-sm btn-outline-dark"
                                         style="font-family: Arial, sans-serif; font-size: 0.75rem; font-weight: bold; border-radius: 0px; padding: 3px 10px; border: 1px solid #000000; background-color: #FFFFFF; color: #000000;">
                                     🖨️ RE-PRINT BADGE
@@ -359,6 +359,10 @@ const barcodeScanner = {
 
         console.log(incomingUrl, "=== Raw Scanned URL Received ===");
         
+        if(incomingUrl.length <= 1){
+            return
+        }
+
         const myNewURL = `${myIp}/qr/mark-attendance/${incomingUrl}`; // http://192.168.1.23:10000
 
         // 2. Perform the domain routing swap cleanly
@@ -369,11 +373,11 @@ const barcodeScanner = {
 
         // let cleanUrl = sanitizedUrl.replace(/\/$/, "");
          
-        console.log("Fixed Safe Local Network Path Assembled:", sanitizedUrl);
+        console.log("=====Fixed Safe Local Network Path Assembled:======", sanitizedUrl);
                 
         try {
             // Send the scan payload up to your API server
-            const response = await fetch(sanitizedUrl, {
+            const response = await fetch(sanitizedUrl, { 
                 method: "GET",
                 headers: { "Content-Type": "application/json" }
             });
@@ -410,38 +414,35 @@ const barcodeScanner = {
         console.log('===updategrid() Grid received', data); // Check the transport
         const targetEmail = data.email; // Example scanned payload
 
-        jhuang.speak( `Welcome ${data.displayname }!`)
-
+        console.log ('reprinting email dat====  ', data.email)
+        
         // 1. Locate the elements using your escaped data attributes
         const parentBadge = document.querySelector(`[data-badge-container="${CSS.escape(targetEmail)}"]`);
         const statusIcon  = document.querySelector(`[data-icon-target="${CSS.escape(targetEmail)}"]`);
         const textSpan    = document.getElementById(targetEmail);
 
         // 2. Change the BADGE COLOR (Swap Bootstrap dark classes)
-        if (parentBadge) {
-            // Remove the Pending (Red) styling classes
-            parentBadge.classList.remove('bg-danger', 'text-danger');
+        // if (parentBadge) {
+        //     // Remove the Pending (Red) styling classes
+        //     parentBadge.classList.remove('bg-danger', 'text-danger');
             
-            // Add the Arrived (Green/Cyan) styling classes
-            parentBadge.classList.add('bg-success', 'text-success'); // Change to bg-info / text-dark if you prefer your cyan theme look
-        }
+        //     // Add the Arrived (Green/Cyan) styling classes
+        //     parentBadge.classList.add('bg-success', 'text-success'); // Change to bg-info / text-dark if you prefer your cyan theme look
+        // }
 
         // 3. Change the STATUS ICON (Swap Bootstrap Icon glyphs)
-        if (statusIcon) {
-            // Remove the clock icon class
-            statusIcon.classList.remove('bi-clock-history');
-            
-            // Add the verified checkmark icon class
-            statusIcon.classList.add('bi-check-circle-fill');
-        }
-
+       
         // 4. Change the INNER TEXT VALUE
-        if (textSpan) { 
-            textSpan.textContent = "Arrived";
-        }
+        // if (textSpan) { 
+        //     textSpan.textContent = "Arrived";
+        // }
+
+        //re-update status that if lost qr remark 
+        await barcodeScanner.rePrintUpdate( `${data.email}` );        
 
         // === 🚀 THE NETWORKING STREAM FIX ===
         console.log("Allowing database network processes to settle before printing...");
+
         // Force a 300ms pause. This lets the browser completely finish the HTTP fetch 
         // cycle so the Bluetooth engine has 100% of the antenna's bandwidth!
         await new Promise(resolve => setTimeout(resolve, 300));
@@ -450,6 +451,39 @@ const barcodeScanner = {
         
     },
 
+    rePrintUpdate: async (email) => {
+
+        console.log('===rePrintUpdate() Grid received', email); // Check the transport
+        
+        try {
+            // Send the scan payload up to your API server
+            const response = await fetch(`${myIp}/qr/remark-attendance/${email}`, { 
+                method: "GET",
+                headers: { "Content-Type": "application/json" }
+            });
+
+            if (!response.ok) throw new Error("Database network error");
+            
+            console.log("RE MARKED successfully recorded in database.");
+
+            const data = await response.json();
+            console.log("Server verification status:", data.status);
+            
+            if(data.status){
+                const textSpan    = document.getElementById(data.xemail);
+                textSpan.textContent = data.xstatus; // Update the text content with the new status
+            
+            }//eif
+        } catch (error) {
+            console.error("Failed to commit scan securely:", error);
+            jhuang.speak("Database network error! Please check your connection and try again.");
+            // =======================================================================
+        } finally {
+            // Turn off the lock when everything is completely finished
+            //isScanningActive = false; 
+        }
+    },
+    
     //helper
     getFontSizeForLength : (text, maxSize, minSize, threshold = 15) => {
         if (text.length <= threshold) return maxSize;
@@ -564,6 +598,10 @@ const barcodeScanner = {
             ctx.textAlign = 'center';
 
             const nameText = prndata.name.toUpperCase();
+
+            //split name here
+            const firstName = nameText.split(',')[1].trim();
+
             const nameFontSize = barcodeScanner.getFontSizeForLength(nameText, 46, 26); // 👈 shrink if over 15 chars
             ctx.font = `bold ${nameFontSize}px Arial`;
             ctx.fillText(nameText, PW / 2, nameY);
@@ -591,9 +629,15 @@ const barcodeScanner = {
                 printDirection: "top"
             });
 
+            jhuang.speak( `Welcome ${ firstName.toLowerCase() }!`)
+
             await task.printInit();
             await task.printPage(encodedImage, 1);
             await task.waitForFinished(); 
+
+            
+            // update grid
+            await barcodeScanner.updateGrid( prndata);
 
             console.log("🎉 Automated badge print loop executed successfully!");
 
@@ -601,9 +645,6 @@ const barcodeScanner = {
             console.error("Transmission error during print phase: ", error);
         } finally {
             
-            // update grid
-            await barcodeScanner.updateGrid( prndata);
-
             // announce complete
             jhuang.speak('Printing complete!');
 
@@ -904,7 +945,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     displayEvents();
 
     //connect to socket.io util.js
-    //not need -> jhuang.connectsocket()
+    // BRING THIS BACK DURING LOCALHOST PRINTING jhuang.connectsocket()
 
     await barcodeScanner.init();
 
