@@ -172,10 +172,13 @@
 <!-- Bootstrap 5.3.3 JS bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+<script src="assets/js/util.min.js?v=2.8"></script> 
+
 <script>
     // ⚠️ PLACEHOLDER STUB — replace this whole block with your real barcodeScanner script include.
     // This exists only so the page doesn't throw a ReferenceError when opened on its own.
-    let myIp= "https://asn-jtgrp-api.onrender.com"
+    //let myIp= "https://asn-jtgrp-api.onrender.com"
+    //let myIp = "http://192.168.1.50:10000"
 
     window.reg = window.reg || {
         register: async () => {
@@ -209,6 +212,8 @@
 
                 console.log('✅ Registration saved:', result);
                 alert('Registration successful!');
+                jhuang.speak("Thank you for registering! Your registration has been successfully saved.");
+
                 document.getElementById('registrationForm').reset();
 
             } catch (error) {
