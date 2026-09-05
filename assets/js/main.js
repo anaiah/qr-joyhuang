@@ -493,7 +493,7 @@ const barcodeScanner = {
         return Math.max(shrunk, minSize);
     },
 
-    getFirstName(nameText) {
+    getFirstName: (nameText) => {
         const trimmed = String(nameText).trim();
 
         if (trimmed.includes(',')) {
