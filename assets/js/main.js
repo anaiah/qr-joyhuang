@@ -1,7 +1,9 @@
 //===== load grid
 document.getElementById('dgrp-grid').innerHTML=""
+
 let client = null;
 let heartbeatInterval = null;
+window.reprintDataStore = [];
 
 const grid = new gridjs.Grid({
      // 1. Keep your selector filter active
@@ -21,11 +23,22 @@ const grid = new gridjs.Grid({
                 // FETCH VALUES FROM BOTH STRUCTURAL TRACKING LAYERS
                 const sourceObj = row?.data || {};
                 
+                ///re-print array
                 const registeredName   = sourceObj.full_name || row?.cells[0]?.data;
                 const registeredEmail  = sourceObj.email     || row?.cells[1]?.data;
                 const registeredCompany = sourceObj.company   || row?.cells[3]?.data;
                 const registeredEvent   = sourceObj.event     || row?.cells[4]?.data;
-                                
+
+                let reprintdata = {
+                    name: registeredName,
+                    email: registeredEmail,
+                    company: registeredCompany,
+                    event: registeredEvent
+                };
+
+                const reprintIdx = window.reprintDataStore.length;
+                window.reprintDataStore.push(reprintdata);
+
                 const registeredArrive = (sourceObj.arrived !== undefined) ? sourceObj.arrived : 
                                         (row?.cells[2]?.data !== undefined) ? row?.cells[2]?.data : 
                                         (row?.cells[3]?.data !== undefined) ? row?.cells[3]?.data : null;
@@ -71,7 +84,7 @@ const grid = new gridjs.Grid({
                                 
                                 <!-- 💡 THE PRINT FUNCTION BUTTON ADDITION:
                                      Maps your parameters straight to printSeminarBadge() inside the button gesture! -->
-                                <button onclick="barcodeScanner.printSeminarBadge('${safeFirstName}', '${safeFullName}')"
+                                <button onclick="barcodeScanner.printSeminarBadge(window.reprintDataStore[${reprintIndex}])"
                                         class="btn btn-sm btn-outline-dark"
                                         style="font-family: Arial, sans-serif; font-size: 0.75rem; font-weight: bold; border-radius: 0px; padding: 3px 10px; border: 1px solid #000000; background-color: #FFFFFF; color: #000000;">
                                     🖨️ RE-PRINT BADGE
