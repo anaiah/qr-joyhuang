@@ -171,6 +171,8 @@
 <script>
     // ⚠️ PLACEHOLDER STUB — replace this whole block with your real barcodeScanner script include.
     // This exists only so the page doesn't throw a ReferenceError when opened on its own.
+    let myIp= "https://asn-jtgrp-api.onrender.com"
+
     window.reg = window.reg || {
         register: async () => {
             // Collect all field values from the form
@@ -188,8 +190,7 @@
             };
 
             try {
-                const myIp= "https://asn-jtgrp-api.onrender.com"
-
+                
                 const response = await fetch(`${myIp}/qr/savereg`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
