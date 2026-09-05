@@ -36,7 +36,7 @@ const grid = new gridjs.Grid({
                     event: registeredEvent
                 };
 
-                const reprintIdx = window.reprintDataStore.length;
+                const reprintIndex = window.reprintDataStore.length;
                 window.reprintDataStore.push(reprintdata);
 
                 const registeredArrive = (sourceObj.arrived !== undefined) ? sourceObj.arrived : 
