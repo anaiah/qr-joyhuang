@@ -70,12 +70,12 @@
                 <!-- 💡 Form Submit Rule: Captures form submissions, stops page refresh, and runs your custom target handler function -->
                 <form id="registrationForm" onsubmit="event.preventDefault(); reg.register(); return false;">
                     
-                    <div class="row">
+                    <!-- <div class="row">
                         <div class="mb-3">
                             <label for="form-event-id" class="form-label small fw-bold text-uppercase text-light">Event Name</label>
                             <input type="text" class="form-control bg-dark text-white border-secondary" id="form-event-id" name="eventId" placeholder="e.g. Masterclass" required>
                         </div>
-                    </div>
+                    </div> -->
                     <div class="row">
                         <!-- First Name Input Row -->
                         <div class="col-md-6 mb-3">
@@ -181,7 +181,7 @@
         register: async () => {
             // Collect all field values from the form
             const payload = {
-                eventId:     document.getElementById('form-event-id').value,
+               // eventId:     document.getElementById('form-event-id').value,
                 firstName:   document.getElementById('firstName').value.trim(),
                 lastName:    document.getElementById('lastName').value.trim(),
                 email:       document.getElementById('userEmail').value.trim(),
