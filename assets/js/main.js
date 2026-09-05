@@ -58,13 +58,11 @@ const grid = new gridjs.Grid({
                 // 💡 PREPARE NAME ARGUMENTS FOR THE PRINTING FUNCTION
                 // 1. Separate the first name automatically (split string by spaces and grab item 0)
                 //const derivedFirstName = String(registeredName).trim().split(" ")[0];
-                const derivedFullName  = String(barcodeScanner.getFirstName(registeredName)).trim();
+                //const derivedFullName  = String(barcodeScanner.getFirstName(registeredName)).trim();
 
                 // 2. Escape any single quotes in the strings so they don't crash your onclick attribute string parsing!
-                const safeFirstName = derivedFirstName.replace(/'/g, "\\'");
-                const safeFullName  = String(registeredName).replace(/'/g, "\\'");
-
-                // Safety check to ensure we don't format the custom empty state row
+                
+                                // Safety check to ensure we don't format the custom empty state row
                 if (registeredName === "") {
                     return gridjs.html(`
                         <div style="position: absolute; left: 0; width: 100%; text-align: center; color: #666666; font-family: Arial, sans-serif; font-size: 0.9rem; font-weight: 500; padding: 40px 0; background-color: #FFFFFF; pointer-events: none; border-bottom: 1px solid #000000;">
