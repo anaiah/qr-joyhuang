@@ -57,8 +57,9 @@ const grid = new gridjs.Grid({
 
                 // 💡 PREPARE NAME ARGUMENTS FOR THE PRINTING FUNCTION
                 // 1. Separate the first name automatically (split string by spaces and grab item 0)
-                const derivedFirstName = String(registeredName).trim().split(" ")[0];
-                
+                //const derivedFirstName = String(registeredName).trim().split(" ")[0];
+                const derivedFullName  = String(getFirstName(registeredName)).trim();
+
                 // 2. Escape any single quotes in the strings so they don't crash your onclick attribute string parsing!
                 const safeFirstName = derivedFirstName.replace(/'/g, "\\'");
                 const safeFullName  = String(registeredName).replace(/'/g, "\\'");
@@ -492,6 +493,17 @@ const barcodeScanner = {
         return Math.max(shrunk, minSize);
     },
 
+    getFirstName(nameText) {
+        const trimmed = String(nameText).trim();
+
+        if (trimmed.includes(',')) {
+            // Format: "REYES, JUN" — first name is after the comma
+            return trimmed.split(',')[1].trim();
+        } else {
+            // Format: "JUN REYES" — first name is the first word
+            return trimmed.split(' ')[0].trim();
+        }
+    },
     //===========PRINTER FUNCS ===============
     printSeminarBadge: async ( prndata ) => {
         if (!window.niimbotClient) {
@@ -600,7 +612,7 @@ const barcodeScanner = {
             const nameText = prndata.name.toUpperCase();
 
             //split name here
-            const firstName = nameText.split(',')[1].trim();
+            const firstName = barcodeScanner.getFirstName(nameText);
 
             const nameFontSize = barcodeScanner.getFontSizeForLength(nameText, 46, 26); // 👈 shrink if over 15 chars
             ctx.font = `bold ${nameFontSize}px Arial`;
